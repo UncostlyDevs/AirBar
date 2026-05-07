@@ -1,0 +1,39 @@
+# Build output
+bin/
+obj/
+publish/
+release/
+artifacts/
+TestResults/
+*.exe
+*.pdb
+
+# Local IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Runtime and logs
+*.log
+*.tmp
+*.bak
+*.cache
+app_debug.log
+AirBarSettings.json
+WindowHistory.json
+AppLauncher.json
+PinnedProfiles.json
+
+# Internal planning and audit material
+project_plan/
+audit/
+audits/
+handoffs/
+verification_logs/
+temp theme files/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,28 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <DrawingImage x:Key="AirBarLogo">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#111827">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="2,2 28,28" RadiusX="8" RadiusY="8"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#38BDF8">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <RectangleGeometry Rect="8,9 16,4" RadiusX="2" RadiusY="2"/>
+                            <RectangleGeometry Rect="6,15 20,4" RadiusX="2" RadiusY="2"/>
+                            <RectangleGeometry Rect="10,21 12,4" RadiusX="2" RadiusY="2"/>
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#A7F3D0">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="24,8" RadiusX="2.25" RadiusY="2.25"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+</ResourceDictionary>

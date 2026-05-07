@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <AssemblyName>AirBar</AssemblyName>
+    <RootNamespace>FloatingTaskbarMenu</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\AirBar.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <Authors>AirBar Contributors</Authors>
+    <Company>AirBar</Company>
+    <Product>AirBar</Product>
+    <Description>A lightweight floating Windows taskbar menu.</Description>
+    <Copyright>Copyright (c) 2026 AirBar Contributors</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Vanara.PInvoke.DwmApi" Version="4.0.2" />
+    <PackageReference Include="Vanara.PInvoke.Shell32" Version="4.0.2" />
+    <PackageReference Include="Vanara.PInvoke.User32" Version="4.0.2" />
+    <PackageReference Include="Vanara.PInvoke.UxTheme" Version="4.0.2" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\ThemeIcons\**\*.ico" />
+    <None Remove="Assets\ThemeIcons\**\*.png" />
+    <Resource Include="Assets\ThemeIcons\**\*.ico" />
+    <Resource Include="Assets\ThemeIcons\**\*.png" />
+  </ItemGroup>
+
+</Project>

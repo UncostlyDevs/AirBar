@@ -1,0 +1,345 @@
+<Window x:Class="FloatingTaskbarMenu.Windows.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:FloatingTaskbarMenu.Models"
+        Title="AirBar - Settings"
+        Width="500"
+        Height="640"
+        MinWidth="500"
+        MinHeight="560"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="True"
+        Background="{DynamicResource MenuBackgroundBrush}"
+        FontFamily="{DynamicResource AirBarFontFamily}"
+        FontSize="{DynamicResource AirBarBaseFontSize}">
+
+    <Window.Resources>
+        <Style x:Key="SettingsExpanderStyle" TargetType="Expander">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontFamily" Value="{DynamicResource AirBarDisplayFontFamily}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style x:Key="SettingsSectionStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="{DynamicResource AirBarBorderThickness}"/>
+            <Setter Property="CornerRadius" Value="{DynamicResource AirBarInnerCornerRadius}"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+        </Style>
+
+        <Style x:Key="SettingsLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style x:Key="SettingsHelpTextStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style x:Key="SettingsErrorTextStyle" TargetType="TextBlock" BasedOn="{StaticResource SettingsHelpTextStyle}">
+            <Setter Property="Foreground" Value="#C42B1C"/>
+            <Setter Property="Visibility" Value="Collapsed"/>
+        </Style>
+
+        <Style x:Key="SettingsCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style x:Key="SettingsRadioButtonStyle" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style x:Key="SettingsComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource ItemHoverBrush}"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource ItemPressedBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SettingsComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsComboBoxItemStyle}"/>
+        </Style>
+
+        <Style x:Key="SettingsTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,4"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{DynamicResource HeaderBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,14">
+            <TextBlock Text="Settings"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       FontFamily="{DynamicResource AirBarDisplayFontFamily}"
+                       Foreground="{DynamicResource HeaderTextBrush}"/>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0">
+            <StackPanel Margin="20,16,20,8">
+
+                <Expander Header="Trigger Button" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <StackPanel x:Name="TriggerButtonPanel">
+                                <RadioButton Content="Left Click" GroupName="TriggerButton" Tag="{x:Static models:MouseButton.Left}"
+                                             Checked="OnTriggerButtonChecked" Style="{StaticResource SettingsRadioButtonStyle}"/>
+                                <RadioButton Content="Right Click" GroupName="TriggerButton" Tag="{x:Static models:MouseButton.Right}"
+                                             Checked="OnTriggerButtonChecked" Style="{StaticResource SettingsRadioButtonStyle}"/>
+                                <RadioButton Content="Middle Click" GroupName="TriggerButton" Tag="{x:Static models:MouseButton.Middle}"
+                                             Checked="OnTriggerButtonChecked" Style="{StaticResource SettingsRadioButtonStyle}" Margin="0"/>
+                            </StackPanel>
+                            <TextBlock Text="Long Press Duration" Style="{StaticResource SettingsLabelStyle}" Margin="0,12,0,4"/>
+                            <Slider Minimum="200" Maximum="2000" TickFrequency="100"
+                                    Value="{Binding LongPressDurationMs}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding LongPressDurationMs, StringFormat={}{0} ms}"
+                                       Style="{StaticResource SettingsHelpTextStyle}"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Behavior" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <CheckBox Content="Start with Windows"
+                                      IsChecked="{Binding AutoStartWithWindows}"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"/>
+                            <CheckBox Content="Minimize to System Tray"
+                                      IsChecked="{Binding MinimizeToTray}"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"
+                                      Margin="0"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Visible Sections" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <CheckBox Content="Window List"
+                                      IsChecked="{Binding ShowWindowList}"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"/>
+                            <CheckBox Content="System Tray"
+                                      IsChecked="{Binding ShowSystemTray}"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"/>
+                            <CheckBox Content="Quick Actions Bar"
+                                      IsChecked="{Binding ShowAuxiliaryControls}"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"
+                                      Margin="0"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Appearance" IsExpanded="True" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Menu Opacity" Style="{StaticResource SettingsLabelStyle}"/>
+                            <Slider Minimum="0.5" Maximum="1.0" TickFrequency="0.05"
+                                    Value="{Binding MenuOpacity}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding MenuOpacity, StringFormat={}{0:P0}}"
+                                       Style="{StaticResource SettingsHelpTextStyle}"
+                                       Margin="0,0,0,10"/>
+                            <TextBlock Text="Menu Width" Style="{StaticResource SettingsLabelStyle}"/>
+                            <Slider Minimum="250" Maximum="500" TickFrequency="10"
+                                    Value="{Binding MenuWidth}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding MenuWidth, StringFormat={}{0} px}"
+                                       Style="{StaticResource SettingsHelpTextStyle}"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Text Colors" IsExpanded="True" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <CheckBox x:Name="UseCustomTextColorsCheck"
+                                      Content="Use custom text colors"
+                                      IsChecked="{Binding UseCustomTextColors}"
+                                      Checked="OnUseCustomTextColorsChanged"
+                                      Unchecked="OnUseCustomTextColorsChanged"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"/>
+                            <TextBlock Text="Custom text colors apply only to the selected theme. Switching themes loads that theme's saved text colors or resets to its defaults."
+                                       Style="{StaticResource SettingsHelpTextStyle}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,10"/>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="112"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Primary" Style="{StaticResource SettingsLabelStyle}" VerticalAlignment="Center"/>
+                                <Button x:Name="PrimaryColorButton" Grid.Column="1" Width="28" Height="24" Tag="PrimaryColor" Click="OnPickTextColorClick"/>
+                                <TextBox x:Name="PrimaryColorBox" Grid.Column="2" Tag="PrimaryColor" TextChanged="OnTextColorHexChanged" Style="{StaticResource SettingsTextBoxStyle}" Margin="8,0,0,0"/>
+                                <TextBlock x:Name="PrimaryColorError" Grid.Column="3" Text="#RRGGBB" Style="{StaticResource SettingsErrorTextStyle}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="112"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Secondary" Style="{StaticResource SettingsLabelStyle}" VerticalAlignment="Center"/>
+                                <Button x:Name="SecondaryColorButton" Grid.Column="1" Width="28" Height="24" Tag="SecondaryColor" Click="OnPickTextColorClick"/>
+                                <TextBox x:Name="SecondaryColorBox" Grid.Column="2" Tag="SecondaryColor" TextChanged="OnTextColorHexChanged" Style="{StaticResource SettingsTextBoxStyle}" Margin="8,0,0,0"/>
+                                <TextBlock x:Name="SecondaryColorError" Grid.Column="3" Text="#RRGGBB" Style="{StaticResource SettingsErrorTextStyle}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </Grid>
+
+                            <Button Content="Reset Text Colors"
+                                    Width="138"
+                                    HorizontalAlignment="Left"
+                                    Click="OnResetTextColorsClick"
+                                    Style="{StaticResource MenuItemButtonStyle}"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Pinned Apps Profile" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <ComboBox x:Name="ProfileComboBox"
+                                          Width="200"
+                                          Style="{StaticResource SettingsComboBoxStyle}"/>
+                                <Button Content="New Profile"
+                                        Margin="8,0,0,0"
+                                        Padding="8,4"
+                                        Click="OnNewProfileClick"
+                                        Style="{StaticResource MenuItemButtonStyle}"/>
+                                <Button Content="Delete Profile"
+                                        Margin="8,0,0,0"
+                                        Padding="8,4"
+                                        Click="OnDeleteProfileClick"
+                                        Style="{StaticResource MenuItemButtonStyle}"/>
+                            </StackPanel>
+                            <CheckBox Content="Auto-save profile when pinning/unpinning"
+                                      IsChecked="{Binding AutoSavePinnedProfile}"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"
+                                      Margin="0"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Window History" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <CheckBox Content="Track window history"
+                                      IsChecked="{Binding TrackWindowHistory}"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"/>
+                            <TextBlock Text="History Filter" Style="{StaticResource SettingsLabelStyle}"/>
+                            <ComboBox x:Name="HistoryFilterComboBox"
+                                      Width="200"
+                                      Style="{StaticResource SettingsComboBoxStyle}"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Bottom Actions" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Configure the 4 quick-action slots shown at the bottom of the AirBar menu."
+                                       Style="{StaticResource SettingsHelpTextStyle}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,10"/>
+                            <StackPanel x:Name="BottomActionsPanel"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Theme Mode" IsExpanded="True" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}" Margin="0,8,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Theme Mode" Style="{StaticResource SettingsLabelStyle}"/>
+                            <ComboBox x:Name="ThemeComboBox"
+                                      Width="200"
+                                      Style="{StaticResource SettingsComboBoxStyle}"
+                                      Margin="0,0,0,8"/>
+                            <CheckBox Content="Minimal Mode (smaller UI)"
+                                      IsChecked="{Binding MinimalMode}"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="Corner Radius:"
+                                           Style="{StaticResource SettingsLabelStyle}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"/>
+                                <Slider Minimum="0" Maximum="20" TickFrequency="2"
+                                        Value="{Binding CornerRadius}" Width="120"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Font Size:"
+                                           Style="{StaticResource SettingsLabelStyle}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"/>
+                                <Slider Minimum="10" Maximum="16" TickFrequency="1"
+                                        Value="{Binding FontSize}" Width="120"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="2" Background="{DynamicResource FooterBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="20,12">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Apply"
+                        Width="88" Height="34"
+                        Margin="0,0,8,0"
+                        Click="OnApplyClick"
+                        Style="{StaticResource MenuItemButtonStyle}"/>
+                <Button Content="Save"
+                        Width="88" Height="34"
+                        Margin="0,0,8,0"
+                        Click="OnSaveClick"
+                        Style="{StaticResource MenuItemButtonStyle}"/>
+                <Button Content="Close"
+                        Width="88" Height="34"
+                        Click="OnCloseClick"
+                        Style="{StaticResource MenuItemButtonStyle}"/>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Window>

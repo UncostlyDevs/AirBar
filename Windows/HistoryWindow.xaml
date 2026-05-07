@@ -1,0 +1,78 @@
+<Window x:Class="FloatingTaskbarMenu.Windows.HistoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:FloatingTaskbarMenu.Models"
+        Title="Window History"
+        Width="400"
+        Height="500"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource MenuBackgroundBrush}"
+        FontFamily="{DynamicResource AirBarFontFamily}">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Recently Closed Windows"
+                   FontSize="18"
+                   FontWeight="SemiBold"
+                   FontFamily="{DynamicResource AirBarDisplayFontFamily}"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   Margin="0,0,0,16"/>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="HistoryList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:WindowHistory}">
+                        <Border Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="{DynamicResource AirBarBorderThickness}"
+                                CornerRadius="{DynamicResource AirBarInnerCornerRadius}"
+                                Padding="12,8"
+                                Margin="0,0,0,8"
+                                MouseRightButtonUp="OnHistoryItemRightClick">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}"
+                                           FontWeight="SemiBold"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding ProcessName}"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,2,0,0"/>
+                                <TextBlock Text="{Binding ClosedTime, StringFormat='Closed: {0:yyyy-MM-dd HH:mm}'}"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Previous"
+                    Width="80" Height="32"
+                    Margin="0,0,8,0"
+                    Click="OnPreviousClick"
+                    Style="{StaticResource MenuItemButtonStyle}"/>
+            <TextBlock x:Name="PageIndicator"
+                       Text="Page 1"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       FontSize="12"
+                       Margin="0,0,8,0"/>
+            <Button Content="Next"
+                    Width="80" Height="32"
+                    Click="OnNextClick"
+                    Style="{StaticResource MenuItemButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

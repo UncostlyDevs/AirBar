@@ -1,0 +1,278 @@
+<Application x:Class="FloatingTaskbarMenu.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             StartupUri="MainWindow.xaml">
+    
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Assets/AirBarLogo.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Default dark color palette -->
+            <Color x:Key="Win11BgColor">#202020</Color>
+            <Color x:Key="Win11CardColor">#2C2C2C</Color>
+            <Color x:Key="Win11BorderColor">#383838</Color>
+            <Color x:Key="Win11HoverColor">#383838</Color>
+            <Color x:Key="Win11PressedColor">#484848</Color>
+            <Color x:Key="Win11AccentColor">#60CDFF</Color>
+            <Color x:Key="Win11AccentDarkColor">#0067C0</Color>
+            <Color x:Key="Win11AcrylicBorderColor">#50FFFFFF</Color>
+
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#9D9D9D"/>
+            <SolidColorBrush x:Key="HeaderTextBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource Win11BorderColor}"/>
+            <SolidColorBrush x:Key="HeaderBrush" Color="{StaticResource Win11CardColor}"/>
+            <SolidColorBrush x:Key="FooterBrush" Color="{StaticResource Win11CardColor}"/>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource Win11CardColor}"/>
+            <SolidColorBrush x:Key="HoverBrush" Color="{StaticResource Win11HoverColor}"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Win11AccentColor}"/>
+            <SolidColorBrush x:Key="AccentDarkBrush" Color="{StaticResource Win11AccentDarkColor}"/>
+            <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="MenuBackgroundBrush" Color="{StaticResource Win11BgColor}"/>
+            <SolidColorBrush x:Key="MenuBorderBrush" Color="{StaticResource Win11AcrylicBorderColor}"/>
+            <SolidColorBrush x:Key="ItemHoverBrush" Color="{StaticResource Win11HoverColor}"/>
+            <SolidColorBrush x:Key="ItemPressedBrush" Color="{StaticResource Win11PressedColor}"/>
+            <SolidColorBrush x:Key="FlyoutBackgroundBrush" Color="{StaticResource Win11CardColor}"/>
+            <SolidColorBrush x:Key="ScrollThumbBrush" Color="#66777777"/>
+            <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#AA9D9D9D"/>
+            <CornerRadius x:Key="AirBarCornerRadius">12</CornerRadius>
+            <CornerRadius x:Key="AirBarInnerCornerRadius">8</CornerRadius>
+            <CornerRadius x:Key="AirBarHeaderCornerRadius">12,12,0,0</CornerRadius>
+            <CornerRadius x:Key="AirBarFooterCornerRadius">0,0,12,12</CornerRadius>
+            <Thickness x:Key="AirBarBorderThickness">1</Thickness>
+            <sys:Double x:Key="AirBarBaseFontSize">12</sys:Double>
+            <sys:String x:Key="AirBarCurrentTheme">Dark</sys:String>
+            <FontFamily x:Key="AirBarFontFamily">Segoe UI Variable, Segoe UI</FontFamily>
+            <FontFamily x:Key="AirBarDisplayFontFamily">Segoe UI Variable Display, Segoe UI</FontFamily>
+
+            <!-- Context Menu (dark, Win11 style) -->
+            <Style x:Key="Win11ContextMenuStyle" TargetType="ContextMenu">
+                <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                <Setter Property="BorderThickness" Value="{DynamicResource AirBarBorderThickness}"/>
+                <Setter Property="Padding" Value="4"/>
+                <Setter Property="HasDropShadow" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ContextMenu">
+                            <Border Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="{DynamicResource AirBarBorderThickness}"
+                                    CornerRadius="{DynamicResource AirBarInnerCornerRadius}"
+                                    Padding="4">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="16" ShadowDepth="4" Opacity="0.5"/>
+                                </Border.Effect>
+                                <ItemsPresenter/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Edge-inspired thin overlay scrollbar -->
+            <Style TargetType="{x:Type ScrollBar}">
+                <Setter Property="Width" Value="8"/>
+                <Setter Property="MinWidth" Value="8"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ScrollBar}">
+                            <Grid x:Name="Root" Background="Transparent" Width="8">
+                                <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" IsHitTestVisible="False"/>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" IsHitTestVisible="False"/>
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb x:Name="Thumb" MinHeight="26">
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="{x:Type Thumb}">
+                                                    <Border x:Name="ThumbBorder"
+                                                            Width="4"
+                                                            HorizontalAlignment="Center"
+                                                            Background="{DynamicResource ScrollThumbBrush}"
+                                                            CornerRadius="4"/>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="ThumbBorder" Property="Width" Value="8"/>
+                                                            <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ScrollThumbHoverBrush}"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsDragging" Value="True">
+                                                            <Setter TargetName="ThumbBorder" Property="Width" Value="8"/>
+                                                            <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Menu Item (Win11 style) -->
+            <Style x:Key="Win11MenuItemStyle" TargetType="MenuItem">
+                <Setter Property="Padding" Value="12,7"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+                <Setter Property="FontSize" Value="{DynamicResource AirBarBaseFontSize}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="MenuItem">
+                            <Border x:Name="Bd"
+                                    Background="Transparent"
+                                    CornerRadius="{DynamicResource AirBarInnerCornerRadius}"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter ContentSource="Header"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsHighlighted" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ItemHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ItemPressedBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Tooltip (Win11 style) -->
+            <Style x:Key="Win11TooltipStyle" TargetType="ToolTip">
+                <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                <Setter Property="BorderThickness" Value="{DynamicResource AirBarBorderThickness}"/>
+                <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+                <Setter Property="FontSize" Value="{DynamicResource AirBarBaseFontSize}"/>
+                <Setter Property="Padding" Value="10,7"/>
+                <Setter Property="HasDropShadow" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToolTip">
+                            <Border Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="{DynamicResource AirBarBorderThickness}"
+                                    CornerRadius="{DynamicResource AirBarInnerCornerRadius}"
+                                    Padding="10,7">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="12" ShadowDepth="3" Opacity="0.5"/>
+                                </Border.Effect>
+                                <ContentPresenter/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Primary action button (Win11 accent) -->
+            <Style x:Key="MenuItemButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="16,8"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+                <Setter Property="FontSize" Value="{DynamicResource AirBarBaseFontSize}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="{DynamicResource AirBarInnerCornerRadius}"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentDarkBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ItemPressedBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Icon/auxiliary button (transparent, rounded) -->
+            <Style x:Key="AuxiliaryButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="{DynamicResource AirBarInnerCornerRadius}"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ItemHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ItemPressedBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Launcher row button -->
+            <Style x:Key="LauncherRowButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="8,6"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="{DynamicResource AirBarInnerCornerRadius}"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ItemHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ItemPressedBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+            <!-- Converters -->
+            <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

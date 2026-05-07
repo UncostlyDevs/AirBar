@@ -1,0 +1,60 @@
+<UserControl x:Class="FloatingTaskbarMenu.Controls.SettingsFlyoutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FloatingTaskbarMenu.Controls"
+             Width="300"
+             MaxHeight="430">
+    <StackPanel>
+        <DockPanel Margin="0,0,0,12">
+            <controls:ThemeIconView Kind="Settings"
+                                    FallbackGlyph="&#xE713;"
+                                    IconSize="16"
+                                    Foreground="{DynamicResource AccentBrush}"
+                                    Margin="0,0,8,0"/>
+            <TextBlock Text="AirBar Settings"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       FontFamily="{DynamicResource AirBarDisplayFontFamily}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+        </DockPanel>
+
+        <CheckBox x:Name="WindowListCheck"
+                  Content="Window list"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
+                  FontFamily="{DynamicResource AirBarFontFamily}"
+                  Margin="0,0,0,8"/>
+        <CheckBox x:Name="TrayCheck"
+                  Content="System tray"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
+                  FontFamily="{DynamicResource AirBarFontFamily}"
+                  Margin="0,0,0,8"/>
+        <CheckBox x:Name="ActionsCheck"
+                  Content="Bottom actions"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
+                  FontFamily="{DynamicResource AirBarFontFamily}"
+                  Margin="0,0,0,8"/>
+        <CheckBox x:Name="HistoryCheck"
+                  Content="Track history"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
+                  FontFamily="{DynamicResource AirBarFontFamily}"
+                  Margin="0,0,0,12"/>
+
+        <TextBlock Text="Theme Mode"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   FontFamily="{DynamicResource AirBarFontFamily}"
+                   FontSize="11"
+                   Margin="0,0,0,4"/>
+        <ComboBox x:Name="ThemeCombo"
+                  Padding="8,4"
+                  Background="{DynamicResource HoverBrush}"
+                  BorderBrush="{DynamicResource BorderBrush}"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
+                  FontFamily="{DynamicResource AirBarFontFamily}"
+                  Margin="0,0,0,12"/>
+
+        <Button Content="Apply"
+                Height="32"
+                Click="OnApplyClick"
+                Style="{StaticResource MenuItemButtonStyle}"/>
+    </StackPanel>
+</UserControl>
