@@ -1,0 +1,66 @@
+<Window x:Class="FloatingTaskbarMenu.Windows.SplashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AirBar"
+        Width="900"
+        Height="650"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        AllowsTransparency="True"
+        Background="Transparent">
+    <Border CornerRadius="24"
+            Background="#F5FFFFFF"
+            BorderBrush="#5538BDF8"
+            BorderThickness="1"
+            SnapsToDevicePixels="True">
+        <Border.Effect>
+            <DropShadowEffect Color="#99000000"
+                              BlurRadius="28"
+                              ShadowDepth="8"
+                              Opacity="0.35"/>
+        </Border.Effect>
+
+        <Grid Margin="70">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    Width="420"
+                    Height="240"
+                    HorizontalAlignment="Center"
+                    CornerRadius="48"
+                    Background="#0F111827">
+                <Image Width="380"
+                       Height="215"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Source="{StaticResource AirBarLogo}"
+                       Stretch="Uniform"/>
+            </Border>
+
+            <TextBlock Grid.Row="1"
+                       Margin="0,55,0,0"
+                       Text="AirBar"
+                       HorizontalAlignment="Center"
+                       FontFamily="Segoe UI Variable Display, Segoe UI"
+                       FontSize="85"
+                       FontWeight="SemiBold"
+                       Foreground="#111827"/>
+
+            <TextBlock Grid.Row="2"
+                       Margin="0,20,0,0"
+                       Text="Floating command bar"
+                       HorizontalAlignment="Center"
+                       FontFamily="Segoe UI Variable, Segoe UI"
+                       FontSize="32"
+                       Foreground="#5B6472"/>
+        </Grid>
+    </Border>
+</Window>

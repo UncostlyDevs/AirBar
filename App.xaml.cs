@@ -13,9 +13,12 @@ public partial class App : WpfApplication
     private SettingsService? _settingsService;
     private TaskbarMenuWindow? _menuWindow;
     private SettingsWindow? _settingsWindow;
+    private SplashWindow? _splashWindow;
+    private DateTime _splashShownAt;
     private System.Windows.Forms.NotifyIcon? _notifyIcon;
     private bool _isInitialized = false;
     private readonly string _logFilePath = string.Empty;
+    private const int SplashMinimumDisplayMs = 1800;
 
     public App()
     {
@@ -49,6 +52,7 @@ public partial class App : WpfApplication
         {
             Log("OnStartup called");
             base.OnStartup(e);
+            ShowSplashWindow();
 
             // Create hidden main window first (keeps app alive, minimal overhead)
             var mainWindow = new MainWindow();
@@ -85,11 +89,13 @@ public partial class App : WpfApplication
                             CreateNotifyIcon();
                             _isInitialized = true;
                             Log("Initialization complete");
+                            CloseSplashWindow();
                         }
                         catch (Exception ex)
                         {
                             Log($"Exception in dispatcher init: {ex.Message}");
                             Log($"Stack trace: {ex.StackTrace}");
+                            CloseSplashWindow();
                         }
                     });
                 }
@@ -115,11 +121,13 @@ public partial class App : WpfApplication
                             CreateNotifyIcon();
                             _isInitialized = true;
                             Log("Fallback initialization complete");
+                            CloseSplashWindow();
                         }
                         catch (Exception ex2)
                         {
                             Log($"Exception in fallback init: {ex2.Message}");
                             Log($"Stack trace: {ex2.StackTrace}");
+                            CloseSplashWindow();
                         }
                     });
                 }
@@ -129,6 +137,70 @@ public partial class App : WpfApplication
         {
             Log($"Exception in OnStartup: {ex.Message}");
             Log($"Stack trace: {ex.StackTrace}");
+            CloseSplashWindow();
+        }
+    }
+
+    private void ShowSplashWindow()
+    {
+        try
+        {
+            _splashWindow = new SplashWindow();
+            _splashShownAt = DateTime.UtcNow;
+            _splashWindow.Show();
+            Log("Splash window shown");
+        }
+        catch (Exception ex)
+        {
+            Log($"Exception showing splash window: {ex.Message}");
+            _splashWindow = null;
+        }
+    }
+
+    private void CloseSplashWindow()
+    {
+        try
+        {
+            if (_splashWindow == null)
+                return;
+
+            var elapsedMs = (DateTime.UtcNow - _splashShownAt).TotalMilliseconds;
+            var remainingMs = Math.Max(0, SplashMinimumDisplayMs - elapsedMs);
+            if (remainingMs <= 0)
+            {
+                CloseSplashWindowNow();
+                return;
+            }
+
+            var timer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(remainingMs)
+            };
+            timer.Tick += (_, _) =>
+            {
+                timer.Stop();
+                CloseSplashWindowNow();
+            };
+            timer.Start();
+        }
+        catch (Exception ex)
+        {
+            Log($"Exception closing splash window: {ex.Message}");
+            CloseSplashWindowNow();
+        }
+    }
+
+    private void CloseSplashWindowNow()
+    {
+        try
+        {
+            _splashWindow?.Close();
+            Log("Splash window closed");
+        }
+        catch { }
+        finally
+        {
+            _splashWindow = null;
         }
     }
 
