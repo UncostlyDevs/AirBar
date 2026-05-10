@@ -8,6 +8,7 @@ public class Settings
     public MouseButton TriggerButton { get; set; } = MouseButton.Left;
     public bool AutoStartWithWindows { get; set; } = false;
     public bool ShowWindowList { get; set; } = true;
+    public bool ShowWorkspaces { get; set; } = true;
     public bool ShowSystemTray { get; set; } = false;
     public bool ShowAuxiliaryControls { get; set; } = true;
     public bool ShowWindowPreviews { get; set; } = true;
@@ -24,13 +25,14 @@ public class Settings
     public bool TrackWindowHistory { get; set; } = true;
     public string CurrentTheme { get; set; } = "Dark";
     public bool MinimalMode { get; set; } = false;
-    public double CornerRadius { get; set; } = 12;
+    public double CornerRadius { get; set; } = 8;
     public double FontSize { get; set; } = 12;
     public bool UseCustomTextColors { get; set; } = false;
     public string LightTextPrimaryColor { get; set; } = "#111111";
-    public string LightTextSecondaryColor { get; set; } = "#333333";
-    public string DarkTextPrimaryColor { get; set; } = "#FFFFFF";
-    public string DarkTextSecondaryColor { get; set; } = "#E6E6E6";
+    public string LightTextSecondaryColor { get; set; } = "#5F5F5F";
+    public string DarkTextPrimaryColor { get; set; } = "#F3F3F3";
+    public string DarkTextSecondaryColor { get; set; } = "#C8C8C8";
+    public bool DefaultWin11StyleMigrated { get; set; } = false;
     public Dictionary<string, ThemeTextColorSettings> CustomTextColorsByTheme { get; set; } = new();
     public List<BottomActionSlot> BottomActionSlots { get; set; } = new();
 }

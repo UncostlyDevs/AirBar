@@ -43,16 +43,19 @@ public class PinnedProfileService
     {
         try
         {
-            var filePath = Path.Combine(_profilesDirectory, $"{profileName}.json");
+            var safeName = NormalizeProfileName(profileName);
+            var filePath = Path.Combine(_profilesDirectory, $"{safeName}.json");
             if (!File.Exists(filePath))
-                return new PinnedProfile { Name = profileName };
+                return new PinnedProfile { Name = safeName };
 
             var json = File.ReadAllText(filePath);
-            return JsonSerializer.Deserialize<PinnedProfile>(json) ?? new PinnedProfile { Name = profileName };
+            var profile = JsonSerializer.Deserialize<PinnedProfile>(json) ?? new PinnedProfile { Name = safeName };
+            profile.Name = NormalizeProfileName(profile.Name);
+            return profile;
         }
         catch
         {
-            return new PinnedProfile { Name = profileName };
+            return new PinnedProfile { Name = NormalizeProfileName(profileName) };
         }
     }
 
@@ -60,9 +63,9 @@ public class PinnedProfileService
     {
         try
         {
+            profile.Name = NormalizeProfileName(profile.Name);
             var filePath = Path.Combine(_profilesDirectory, $"{profile.Name}.json");
-            var json = JsonSerializer.Serialize(profile, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(filePath, json);
+            StorageHelpers.WriteJsonAtomic(filePath, profile);
         }
         catch { }
     }
@@ -71,6 +74,7 @@ public class PinnedProfileService
     {
         try
         {
+            profileName = NormalizeProfileName(profileName);
             if (profileName == "Default")
                 return;
 
@@ -83,10 +87,14 @@ public class PinnedProfileService
 
     public bool ProfileExists(string profileName)
     {
+        profileName = NormalizeProfileName(profileName);
         if (profileName == "Default")
             return true;
 
         var filePath = Path.Combine(_profilesDirectory, $"{profileName}.json");
         return File.Exists(filePath);
     }
+
+    private static string NormalizeProfileName(string profileName)
+        => StorageHelpers.ToSafeFileName(profileName, "Default");
 }

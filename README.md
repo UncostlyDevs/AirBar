@@ -5,7 +5,7 @@
 <h1 align="center">WinAirBar</h1>
 
 <p align="center">
-  <strong>A lightweight floating Windows taskbar menu, window switcher, and app launcher for Windows 10 and Windows 11.</strong>
+  <strong>A lightweight floating Windows taskbar menu with Workspace Memory, window switching, and app launching for Windows 10 and Windows 11.</strong>
 </p>
 
 <p align="center">
@@ -29,13 +29,24 @@ WinAirBar is a small Windows productivity utility that gives you a compact float
 
 It is built for people who want a cleaner Windows desktop workflow: quick window switching, a fast app launcher, local window history, power controls, volume controls, network shortcuts, and customizable action buttons in one lightweight tray app.
 
-WinAirBar was previously released as **AirBar**. Version 1.2.0 renamed the product, updated the release metadata, and safely migrates existing local settings from `%AppData%\AirBar` to `%AppData%\WinAirBar`.
+WinAirBar was previously released as **AirBar**. Version 1.2.0 renamed the product, updated the release metadata, and safely migrates existing local settings from `%AppData%\AirBar` to `%AppData%\WinAirBar`. Version 1.3.0 adds Workspace Memory, cleaner Windows 11-style UI polish, app-themed dialogs, and stronger workspace restore confidence.
+
+## Current Release: v1.3.0
+
+WinAirBar v1.3.0 is the Workspace Memory release. It adds a local-first way to capture, preview, and restore window layouts directly from the WinAirBar menu, plus a cleaner default Windows 11-style interface.
+
+- Capture the current workspace, including window positions, monitor layout, apps, and document paths when available.
+- Preview restore readiness before acting, including missing apps, missing documents, and monitor-layout changes.
+- Restore, update, and delete saved workspaces from the menu without leaving the main flow.
+- Use sharper Windows 11-style defaults, readable Settings dropdowns in dark and light mode, and app-themed confirmation dialogs.
+- Keep everything local under your user profile: no account, no telemetry, no cloud workspace sync.
 
 ## Why Use It?
 
 - Get a floating Windows taskbar menu from a mouse trigger instead of reaching for the main taskbar.
 - Switch between active windows from a compact flyout.
 - Reopen recent windows and frequently used apps faster.
+- Save and restore workspace layouts before switching projects or returning to a previous setup.
 - Keep pinned launch shortcuts close without cluttering the desktop.
 - Put power, volume, network, settings, and custom actions in one bottom action bar.
 - Use retro Windows-inspired themes alongside modern Windows 10/11 styling.
@@ -63,9 +74,13 @@ Track window history locally so you can reopen or return to recent work more eas
 
 Configure quick actions for power, restart, sleep, sign out, lock, volume, sound settings, network, folders, app data, settings, and custom launch targets.
 
+### Workspace Memory
+
+Capture the current window layout, choose a saved workspace from the menu, and restore it later. Workspace Memory shows window counts, monitor layout changes, missing apps/documents, and restore readiness before you act. Restore results are summarized inline after each restore, so you can tell whether the workspace came back cleanly or needs attention.
+
 ### Safety Prompts
 
-Power actions ask for confirmation before shutdown, restart, sleep, or sign out. Custom action slots ask for confirmation before first launch.
+Power actions ask for confirmation before shutdown, restart, sleep, or sign out. Custom action slots ask for confirmation before first launch. WinAirBar-owned confirmation and info dialogs use the app theme instead of the default system message-box style.
 
 ### Windows Themes
 
@@ -77,10 +92,10 @@ Download the latest Windows x64 release from:
 
 https://github.com/UncostlyDevs/WinAirBar/releases/latest
 
-Current v1.2.0 release asset:
+Current v1.3.0 release asset:
 
 ```text
-WinAirBar-v1.2.0-win-x64.exe
+WinAirBar-v1.3.0-win-x64.exe
 ```
 
 WinAirBar is distributed as a self-contained Windows executable. No installer is required.
@@ -88,13 +103,13 @@ WinAirBar is distributed as a self-contained Windows executable. No installer is
 Because the executable is currently unsigned, Windows SmartScreen may show a first-run warning. Verify the SHA256 checksum published with the release before running the EXE.
 
 ```powershell
-Get-FileHash .\WinAirBar-v1.2.0-win-x64.exe -Algorithm SHA256
+Get-FileHash .\WinAirBar-v1.3.0-win-x64.exe -Algorithm SHA256
 ```
 
-Expected v1.2.0 SHA256:
+Expected v1.3.0 SHA256:
 
 ```text
-0F8175C93B8CAAE4F3F5E5C2AB2FA6342BE1534871D25A09799273E6C986FA21
+2915BE21BCF8DC6E870649BCD1F5E8EAFB2B5D6BC43BD4FEA61EF80C0A6C9A59
 ```
 
 ## Requirements

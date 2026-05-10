@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using FloatingTaskbarMenu.Controls;
 using FloatingTaskbarMenu.Core;
 using FloatingTaskbarMenu.Models;
 using Vanara.PInvoke;
@@ -19,9 +20,12 @@ public partial class TaskbarMenuWindow : Window
     private readonly PinnedProfileService _pinnedProfileService;
     private readonly WindowHistoryService _historyService;
     private readonly AppLauncherService _appLauncherService;
+    private readonly WorkspaceService _workspaceService;
     private Settings _settings;
     private HistoryWindow? _historyWindow;
+    private Popup? _workspacePopup;
     private bool _suppressNextDeactivateClose;
+    private int _autoCloseSuppressionCount;
 
     public TaskbarMenuWindow(WindowManager windowManager, SettingsService settingsService)
     {
@@ -30,6 +34,7 @@ public partial class TaskbarMenuWindow : Window
         _pinnedProfileService = new PinnedProfileService();
         _historyService = new WindowHistoryService();
         _appLauncherService = new AppLauncherService();
+        _workspaceService = new WorkspaceService();
         _settings = settingsService.Settings;
 
         InitializeComponent();
@@ -125,6 +130,9 @@ public partial class TaskbarMenuWindow : Window
 
     private void OnDeactivated(object? sender, EventArgs e)
     {
+        if (_autoCloseSuppressionCount > 0)
+            return;
+
         if (_suppressNextDeactivateClose)
         {
             _suppressNextDeactivateClose = false;
@@ -138,6 +146,18 @@ public partial class TaskbarMenuWindow : Window
     public void SuppressNextDeactivateClose()
     {
         _suppressNextDeactivateClose = true;
+    }
+
+    public IDisposable SuspendAutoClose()
+    {
+        _autoCloseSuppressionCount++;
+        return new AutoCloseSuspension(this);
+    }
+
+    private void ResumeAutoClose()
+    {
+        if (_autoCloseSuppressionCount > 0)
+            _autoCloseSuppressionCount--;
     }
 
     private void ApplyDwmBackground()
@@ -161,6 +181,56 @@ public partial class TaskbarMenuWindow : Window
             DataContext = _settings;
             RefreshWindows();
         });
+    }
+
+    private void CloseWorkspacePopup()
+    {
+        try
+        {
+            if (_workspacePopup != null)
+            {
+                _workspacePopup.IsOpen = false;
+                _workspacePopup = null;
+            }
+        }
+        catch { }
+    }
+
+    private void ShowWorkspacePopup()
+    {
+        try
+        {
+            CloseWorkspacePopup();
+            SuppressNextDeactivateClose();
+
+            var view = new WorkspacesView();
+            view.SetContext(_workspaceService, _windowManager, _settingsService, this);
+
+             var border = new Border
+             {
+                 BorderThickness = new Thickness(1),
+                 Padding = new Thickness(8),
+                 Child = view
+             };
+            border.SetResourceReference(Border.BackgroundProperty, "FlyoutBackgroundBrush");
+            border.SetResourceReference(Border.BorderBrushProperty, "MenuBorderBrush");
+            border.SetResourceReference(Border.CornerRadiusProperty, "AirBarCornerRadius");
+            border.SetResourceReference(Border.BorderThicknessProperty, "AirBarBorderThickness");
+
+            _workspacePopup = new Popup
+            {
+                PlacementTarget = WorkspaceButton,
+                Placement = PlacementMode.Bottom,
+                AllowsTransparency = true,
+                PopupAnimation = PopupAnimation.Fade,
+                StaysOpen = false,
+                Child = border
+            };
+
+            _workspacePopup.Closed += (s, e) => _workspacePopup = null;
+            _workspacePopup.IsOpen = true;
+        }
+        catch { }
     }
 
     public void PositionAtCursor()
@@ -301,6 +371,11 @@ public partial class TaskbarMenuWindow : Window
         AuxiliaryControls.ShowSettingsFlyout(QuickSettingsButton);
     }
 
+    private void OnWorkspaceClick(object sender, RoutedEventArgs e)
+    {
+        ShowWorkspacePopup();
+    }
+
     [DllImport("user32.dll")]
     private static extern bool GetCursorPos(out System.Drawing.Point lpPoint);
 
@@ -337,4 +412,21 @@ public partial class TaskbarMenuWindow : Window
     }
 
     private const uint MONITOR_DEFAULTTONEAREST = 0x00000002;
+
+    private sealed class AutoCloseSuspension : IDisposable
+    {
+        private TaskbarMenuWindow? _owner;
+
+        public AutoCloseSuspension(TaskbarMenuWindow owner)
+        {
+            _owner = owner;
+        }
+
+        public void Dispose()
+        {
+            _owner?.ResumeAutoClose();
+            _owner = null;
+        }
+    }
+
 }

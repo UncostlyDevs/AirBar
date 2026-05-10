@@ -178,22 +178,27 @@ public partial class SettingsWindow : Window
 
         root.Children.Add(MakeLabel("Display Label"));
         var labelBox = MakeTextBox(_bottomActionBarService.GetDisplayLabel(slot));
+        labelBox.ToolTip = "Name shown on the quick-action button";
         root.Children.Add(labelBox);
 
         root.Children.Add(MakeLabel("Action Type"));
         var actionTypeCombo = MakeComboBox(["BuiltIn", "Custom"], slot.ActionKind == BottomActionKind.BuiltIn ? "BuiltIn" : "Custom");
+        actionTypeCombo.ToolTip = "Choose built-in or custom action";
         root.Children.Add(actionTypeCombo);
 
         root.Children.Add(MakeLabel("Built-in Action"));
         var builtInCombo = MakeComboBox(builtInLabels, _bottomActionBarService.GetDefinition(slot.BuiltInAction).Label);
+        builtInCombo.ToolTip = "Choose a built-in action";
         root.Children.Add(builtInCombo);
 
         root.Children.Add(MakeLabel("Custom Target"));
         var targetBox = MakeTextBox(slot.TargetPath);
+        targetBox.ToolTip = "Path, folder, app, or URL to launch";
         root.Children.Add(targetBox);
 
         var targetButtons = new StackPanel { Orientation = System.Windows.Controls.Orientation.Horizontal, Margin = new Thickness(0, 4, 0, 8) };
         var browseFileButton = MakeSmallButton("Browse File");
+        browseFileButton.ToolTip = "Pick an app or shortcut";
         browseFileButton.Click += (s, e) =>
         {
             var dialog = new Microsoft.Win32.OpenFileDialog
@@ -212,6 +217,7 @@ public partial class SettingsWindow : Window
 
         var browseFolderButton = MakeSmallButton("Browse Folder");
         browseFolderButton.Margin = new Thickness(8, 0, 0, 0);
+        browseFolderButton.ToolTip = "Pick a folder";
         browseFolderButton.Click += (s, e) =>
         {
             using var dialog = new Forms.FolderBrowserDialog();
@@ -227,6 +233,7 @@ public partial class SettingsWindow : Window
 
         var browseUrlButton = MakeSmallButton("Set URL");
         browseUrlButton.Margin = new Thickness(8, 0, 0, 0);
+        browseUrlButton.ToolTip = "Enter a URL or URI";
         browseUrlButton.Click += (s, e) =>
         {
             var dialog = new InputDialog("Custom URL", "Enter a URL or URI:");
@@ -238,17 +245,20 @@ public partial class SettingsWindow : Window
 
         root.Children.Add(MakeLabel("Arguments"));
         var argumentsBox = MakeTextBox(slot.Arguments);
+        argumentsBox.ToolTip = "Optional command-line arguments";
         root.Children.Add(argumentsBox);
 
         root.Children.Add(MakeLabel("Working Directory"));
         var workingDirectoryBox = MakeTextBox(slot.WorkingDirectory);
+        workingDirectoryBox.ToolTip = "Optional folder to run from";
         root.Children.Add(workingDirectoryBox);
 
         var autoIconCheck = new WpfCheckBox
         {
             Content = "Use auto icon",
             IsChecked = slot.UseAutoIcon,
-            Margin = new Thickness(0, 8, 0, 6)
+            Margin = new Thickness(0, 8, 0, 6),
+            ToolTip = "Use the target app or file icon"
         };
         BindResource(autoIconCheck, WpfControl.ForegroundProperty, "TextPrimaryBrush");
         BindResource(autoIconCheck, WpfControl.FontFamilyProperty, "AirBarFontFamily");
@@ -256,10 +266,12 @@ public partial class SettingsWindow : Window
 
         root.Children.Add(MakeLabel("Custom Icon Path"));
         var iconPathBox = MakeTextBox(slot.CustomIconPath);
+        iconPathBox.ToolTip = "Optional custom icon path";
         root.Children.Add(iconPathBox);
 
         var iconButtons = new StackPanel { Orientation = System.Windows.Controls.Orientation.Horizontal, Margin = new Thickness(0, 4, 0, 0) };
         var browseIconButton = MakeSmallButton("Browse Icon");
+        browseIconButton.ToolTip = "Pick a custom icon";
         browseIconButton.Click += (s, e) =>
         {
             var dialog = new Microsoft.Win32.OpenFileDialog
@@ -277,6 +289,7 @@ public partial class SettingsWindow : Window
 
         var resetButton = MakeSmallButton("Reset Slot");
         resetButton.Margin = new Thickness(8, 0, 0, 0);
+        resetButton.ToolTip = "Restore this slot to its default";
         resetButton.Click += (s, e) =>
         {
             var defaultSlot = _bottomActionBarService.CreateDefaultSlots()[slot.SlotIndex];
@@ -459,13 +472,14 @@ public partial class SettingsWindow : Window
             FontSize = 12,
             Padding = new Thickness(8, 4, 8, 4),
             BorderThickness = new Thickness(1),
-            Margin = new Thickness(0, 0, 0, 8)
+            Margin = new Thickness(0, 0, 0, 8),
+            Style = (Style)FindResource("ThemedComboBoxStyle")
         };
         BindResource(combo, WpfControl.BackgroundProperty, "HoverBrush");
         BindResource(combo, WpfControl.BorderBrushProperty, "BorderBrush");
         BindResource(combo, WpfControl.ForegroundProperty, "TextPrimaryBrush");
         BindResource(combo, WpfControl.FontFamilyProperty, "AirBarFontFamily");
-        BindResource(combo, ItemsControl.ItemContainerStyleProperty, "SettingsComboBoxItemStyle");
+        BindResource(combo, ItemsControl.ItemContainerStyleProperty, "ThemedComboBoxItemStyle");
         return combo;
     }
 

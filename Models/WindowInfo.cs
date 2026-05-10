@@ -10,9 +10,24 @@ public class WindowInfo
     public string Title { get; set; } = "";
     public string ProcessName { get; set; } = "";
     public string ExecutablePath { get; set; } = "";
+    public string ClassName { get; set; } = "";
+    public string MonitorId { get; set; } = "";
+    public double Left { get; set; }
+    public double Top { get; set; }
+    public double Width { get; set; }
+    public double Height { get; set; }
+    public WindowPlacementState PlacementState { get; set; } = WindowPlacementState.Normal;
+    public WorkspaceWindowPlacement Placement { get; set; } = new();
     public int ProcessId { get; set; }
     public bool IsPinned { get; set; }
     public BitmapSource? Icon { get; set; }
+}
+
+public enum WindowPlacementState
+{
+    Normal,
+    Minimized,
+    Maximized
 }
 
 public class WindowGroup

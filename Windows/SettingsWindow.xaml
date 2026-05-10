@@ -28,8 +28,8 @@
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="{DynamicResource AirBarBorderThickness}"/>
             <Setter Property="CornerRadius" Value="{DynamicResource AirBarInnerCornerRadius}"/>
-            <Setter Property="Padding" Value="14,12"/>
-            <Setter Property="Margin" Value="0,8,0,0"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
         </Style>
 
         <Style x:Key="SettingsLabelStyle" TargetType="TextBlock">
@@ -65,30 +65,13 @@
             <Setter Property="Margin" Value="0,0,0,4"/>
         </Style>
 
-        <Style x:Key="SettingsComboBoxItemStyle" TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Style.Triggers>
-                <Trigger Property="IsHighlighted" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource ItemHoverBrush}"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource ItemPressedBrush}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <Style x:Key="SettingsComboBoxItemStyle"
+               TargetType="ComboBoxItem"
+               BasedOn="{StaticResource ThemedComboBoxItemStyle}"/>
 
-        <Style x:Key="SettingsComboBoxStyle" TargetType="ComboBox">
-            <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-            <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsComboBoxItemStyle}"/>
-        </Style>
+        <Style x:Key="SettingsComboBoxStyle"
+               TargetType="ComboBox"
+               BasedOn="{StaticResource ThemedComboBoxStyle}"/>
 
         <Style x:Key="SettingsTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontFamily" Value="{DynamicResource AirBarFontFamily}"/>
@@ -123,14 +106,18 @@
                         <StackPanel>
                             <StackPanel x:Name="TriggerButtonPanel">
                                 <RadioButton Content="Left Click" GroupName="TriggerButton" Tag="{x:Static models:MouseButton.Left}"
+                                             ToolTip="Open WinAirBar with left click"
                                              Checked="OnTriggerButtonChecked" Style="{StaticResource SettingsRadioButtonStyle}"/>
                                 <RadioButton Content="Right Click" GroupName="TriggerButton" Tag="{x:Static models:MouseButton.Right}"
+                                             ToolTip="Open WinAirBar with right click"
                                              Checked="OnTriggerButtonChecked" Style="{StaticResource SettingsRadioButtonStyle}"/>
                                 <RadioButton Content="Middle Click" GroupName="TriggerButton" Tag="{x:Static models:MouseButton.Middle}"
+                                             ToolTip="Open WinAirBar with middle click"
                                              Checked="OnTriggerButtonChecked" Style="{StaticResource SettingsRadioButtonStyle}" Margin="0"/>
                             </StackPanel>
                             <TextBlock Text="Long Press Duration" Style="{StaticResource SettingsLabelStyle}" Margin="0,12,0,4"/>
                             <Slider Minimum="200" Maximum="2000" TickFrequency="100"
+                                    ToolTip="Set how long a press must be"
                                     Value="{Binding LongPressDurationMs}" Margin="0,0,0,4"/>
                             <TextBlock Text="{Binding LongPressDurationMs, StringFormat={}{0} ms}"
                                        Style="{StaticResource SettingsHelpTextStyle}"/>
@@ -143,9 +130,11 @@
                         <StackPanel>
                             <CheckBox Content="Start with Windows"
                                       IsChecked="{Binding AutoStartWithWindows}"
+                                      ToolTip="Launch WinAirBar when Windows starts"
                                       Style="{StaticResource SettingsCheckBoxStyle}"/>
                             <CheckBox Content="Minimize to System Tray"
                                       IsChecked="{Binding MinimizeToTray}"
+                                      ToolTip="Keep WinAirBar running in the tray when closed"
                                       Style="{StaticResource SettingsCheckBoxStyle}"
                                       Margin="0"/>
                         </StackPanel>
@@ -157,12 +146,19 @@
                         <StackPanel>
                             <CheckBox Content="Window List"
                                       IsChecked="{Binding ShowWindowList}"
+                                      ToolTip="Show open windows in the menu"
+                                      Style="{StaticResource SettingsCheckBoxStyle}"/>
+                            <CheckBox Content="Workspaces"
+                                      IsChecked="{Binding ShowWorkspaces}"
+                                      ToolTip="Show the Workspace Memory button"
                                       Style="{StaticResource SettingsCheckBoxStyle}"/>
                             <CheckBox Content="System Tray"
                                       IsChecked="{Binding ShowSystemTray}"
+                                      ToolTip="Show tray icons in the menu"
                                       Style="{StaticResource SettingsCheckBoxStyle}"/>
                             <CheckBox Content="Quick Actions Bar"
                                       IsChecked="{Binding ShowAuxiliaryControls}"
+                                      ToolTip="Show the bottom quick-action buttons"
                                       Style="{StaticResource SettingsCheckBoxStyle}"
                                       Margin="0"/>
                         </StackPanel>
@@ -174,12 +170,14 @@
                         <StackPanel>
                             <TextBlock Text="Menu Opacity" Style="{StaticResource SettingsLabelStyle}"/>
                             <Slider Minimum="0.5" Maximum="1.0" TickFrequency="0.05"
+                                    ToolTip="Adjust menu transparency"
                                     Value="{Binding MenuOpacity}" Margin="0,0,0,4"/>
                             <TextBlock Text="{Binding MenuOpacity, StringFormat={}{0:P0}}"
                                        Style="{StaticResource SettingsHelpTextStyle}"
                                        Margin="0,0,0,10"/>
                             <TextBlock Text="Menu Width" Style="{StaticResource SettingsLabelStyle}"/>
                             <Slider Minimum="250" Maximum="500" TickFrequency="10"
+                                    ToolTip="Adjust menu width"
                                     Value="{Binding MenuWidth}" Margin="0,0,0,4"/>
                             <TextBlock Text="{Binding MenuWidth, StringFormat={}{0} px}"
                                        Style="{StaticResource SettingsHelpTextStyle}"/>
@@ -193,6 +191,7 @@
                             <CheckBox x:Name="UseCustomTextColorsCheck"
                                       Content="Use custom text colors"
                                       IsChecked="{Binding UseCustomTextColors}"
+                                      ToolTip="Override text colors for this theme"
                                       Checked="OnUseCustomTextColorsChanged"
                                       Unchecked="OnUseCustomTextColorsChanged"
                                       Style="{StaticResource SettingsCheckBoxStyle}"/>
@@ -209,8 +208,8 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Primary" Style="{StaticResource SettingsLabelStyle}" VerticalAlignment="Center"/>
-                                <Button x:Name="PrimaryColorButton" Grid.Column="1" Width="28" Height="24" Tag="PrimaryColor" Click="OnPickTextColorClick"/>
-                                <TextBox x:Name="PrimaryColorBox" Grid.Column="2" Tag="PrimaryColor" TextChanged="OnTextColorHexChanged" Style="{StaticResource SettingsTextBoxStyle}" Margin="8,0,0,0"/>
+                                <Button x:Name="PrimaryColorButton" Grid.Column="1" Width="28" Height="24" Tag="PrimaryColor" ToolTip="Pick primary text color" Click="OnPickTextColorClick"/>
+                                <TextBox x:Name="PrimaryColorBox" Grid.Column="2" Tag="PrimaryColor" ToolTip="Enter primary text color as #RRGGBB" TextChanged="OnTextColorHexChanged" Style="{StaticResource SettingsTextBoxStyle}" Margin="8,0,0,0"/>
                                 <TextBlock x:Name="PrimaryColorError" Grid.Column="3" Text="#RRGGBB" Style="{StaticResource SettingsErrorTextStyle}" VerticalAlignment="Center" Margin="8,0,0,0"/>
                             </Grid>
 
@@ -222,14 +221,15 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Secondary" Style="{StaticResource SettingsLabelStyle}" VerticalAlignment="Center"/>
-                                <Button x:Name="SecondaryColorButton" Grid.Column="1" Width="28" Height="24" Tag="SecondaryColor" Click="OnPickTextColorClick"/>
-                                <TextBox x:Name="SecondaryColorBox" Grid.Column="2" Tag="SecondaryColor" TextChanged="OnTextColorHexChanged" Style="{StaticResource SettingsTextBoxStyle}" Margin="8,0,0,0"/>
+                                <Button x:Name="SecondaryColorButton" Grid.Column="1" Width="28" Height="24" Tag="SecondaryColor" ToolTip="Pick secondary text color" Click="OnPickTextColorClick"/>
+                                <TextBox x:Name="SecondaryColorBox" Grid.Column="2" Tag="SecondaryColor" ToolTip="Enter secondary text color as #RRGGBB" TextChanged="OnTextColorHexChanged" Style="{StaticResource SettingsTextBoxStyle}" Margin="8,0,0,0"/>
                                 <TextBlock x:Name="SecondaryColorError" Grid.Column="3" Text="#RRGGBB" Style="{StaticResource SettingsErrorTextStyle}" VerticalAlignment="Center" Margin="8,0,0,0"/>
                             </Grid>
 
                             <Button Content="Reset Text Colors"
                                     Width="138"
                                     HorizontalAlignment="Left"
+                                    ToolTip="Restore text colors for this theme"
                                     Click="OnResetTextColorsClick"
                                     Style="{StaticResource MenuItemButtonStyle}"/>
                         </StackPanel>
@@ -242,20 +242,24 @@
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                 <ComboBox x:Name="ProfileComboBox"
                                           Width="200"
+                                          ToolTip="Choose the pinned-app profile"
                                           Style="{StaticResource SettingsComboBoxStyle}"/>
                                 <Button Content="New Profile"
                                         Margin="8,0,0,0"
                                         Padding="8,4"
+                                        ToolTip="Create a pinned-app profile"
                                         Click="OnNewProfileClick"
                                         Style="{StaticResource MenuItemButtonStyle}"/>
                                 <Button Content="Delete Profile"
                                         Margin="8,0,0,0"
                                         Padding="8,4"
+                                        ToolTip="Delete the selected profile"
                                         Click="OnDeleteProfileClick"
                                         Style="{StaticResource MenuItemButtonStyle}"/>
                             </StackPanel>
                             <CheckBox Content="Auto-save profile when pinning/unpinning"
                                       IsChecked="{Binding AutoSavePinnedProfile}"
+                                      ToolTip="Save pin changes automatically"
                                       Style="{StaticResource SettingsCheckBoxStyle}"
                                       Margin="0"/>
                         </StackPanel>
@@ -267,10 +271,12 @@
                         <StackPanel>
                             <CheckBox Content="Track window history"
                                       IsChecked="{Binding TrackWindowHistory}"
+                                      ToolTip="Remember recently closed windows"
                                       Style="{StaticResource SettingsCheckBoxStyle}"/>
                             <TextBlock Text="History Filter" Style="{StaticResource SettingsLabelStyle}"/>
                             <ComboBox x:Name="HistoryFilterComboBox"
                                       Width="200"
+                                      ToolTip="Choose how much history to keep"
                                       Style="{StaticResource SettingsComboBoxStyle}"/>
                         </StackPanel>
                     </Border>
@@ -295,9 +301,11 @@
                             <ComboBox x:Name="ThemeComboBox"
                                       Width="200"
                                       Style="{StaticResource SettingsComboBoxStyle}"
+                                      ToolTip="Choose the app theme"
                                       Margin="0,0,0,8"/>
                             <CheckBox Content="Minimal Mode (smaller UI)"
                                       IsChecked="{Binding MinimalMode}"
+                                      ToolTip="Use a denser menu layout"
                                       Style="{StaticResource SettingsCheckBoxStyle}"/>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                 <TextBlock Text="Corner Radius:"
@@ -305,6 +313,7 @@
                                            VerticalAlignment="Center"
                                            Margin="0,0,8,0"/>
                                 <Slider Minimum="0" Maximum="20" TickFrequency="2"
+                                        ToolTip="Adjust menu corner roundness"
                                         Value="{Binding CornerRadius}" Width="120"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
@@ -313,6 +322,7 @@
                                            VerticalAlignment="Center"
                                            Margin="0,0,8,0"/>
                                 <Slider Minimum="10" Maximum="16" TickFrequency="1"
+                                        ToolTip="Adjust menu font size"
                                         Value="{Binding FontSize}" Width="120"/>
                             </StackPanel>
                         </StackPanel>
@@ -327,15 +337,18 @@
                 <Button Content="Apply"
                         Width="88" Height="34"
                         Margin="0,0,8,0"
+                        ToolTip="Apply changes without closing"
                         Click="OnApplyClick"
                         Style="{StaticResource MenuItemButtonStyle}"/>
                 <Button Content="Save"
                         Width="88" Height="34"
                         Margin="0,0,8,0"
+                        ToolTip="Save changes and close"
                         Click="OnSaveClick"
                         Style="{StaticResource MenuItemButtonStyle}"/>
                 <Button Content="Close"
                         Width="88" Height="34"
+                        ToolTip="Close settings"
                         Click="OnCloseClick"
                         Style="{StaticResource MenuItemButtonStyle}"/>
             </StackPanel>

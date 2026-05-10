@@ -16,7 +16,7 @@
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\WinAirBarApp.ico</ApplicationIcon>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <Authors>WinAirBar Contributors</Authors>
     <Company>WinAirBar</Company>
     <Product>WinAirBar</Product>
@@ -25,6 +25,10 @@
     <PackageProjectUrl>https://winairbar.com</PackageProjectUrl>
     <PackageTags>windows;taskbar;launcher;productivity;winairbar</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Tests\**\*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Vanara.PInvoke.DwmApi" Version="4.0.2" />
@@ -42,6 +46,9 @@
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
       <_Parameter1>Contact</_Parameter1>
       <_Parameter2>sag@winairbar.com</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>WorkspaceAudit</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 

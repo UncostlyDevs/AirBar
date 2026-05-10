@@ -81,6 +81,10 @@
                                                FontSize="11"
                                                Foreground="{DynamicResource TextSecondaryBrush}"
                                                Margin="0,2,0,0"/>
+                                    <TextBlock Text="Click to switch - right-click for options"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               Margin="0,4,0,0"/>
                                 </StackPanel>
                             </ToolTip>
                         </Button.ToolTip>
@@ -109,6 +113,7 @@
                               BorderThickness="0"
                               Padding="8,4"
                               Margin="0,2"
+                              ToolTip="Expand grouped windows"
                               Foreground="{DynamicResource TextSecondaryBrush}">
                         <Expander.Header>
                             <DockPanel>
@@ -153,6 +158,10 @@
                                                                FontSize="11"
                                                                Foreground="{DynamicResource TextSecondaryBrush}"
                                                                Margin="0,2,0,0"/>
+                                                    <TextBlock Text="Click to switch - right-click for options"
+                                                               FontSize="10"
+                                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                                               Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </ToolTip>
                                         </Button.ToolTip>

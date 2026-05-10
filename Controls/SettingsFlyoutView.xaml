@@ -20,21 +20,25 @@
 
         <CheckBox x:Name="WindowListCheck"
                   Content="Window list"
+                  ToolTip="Show or hide open windows"
                   Foreground="{DynamicResource TextPrimaryBrush}"
                   FontFamily="{DynamicResource AirBarFontFamily}"
                   Margin="0,0,0,8"/>
         <CheckBox x:Name="TrayCheck"
                   Content="System tray"
+                  ToolTip="Show or hide tray icons"
                   Foreground="{DynamicResource TextPrimaryBrush}"
                   FontFamily="{DynamicResource AirBarFontFamily}"
                   Margin="0,0,0,8"/>
         <CheckBox x:Name="ActionsCheck"
                   Content="Bottom actions"
+                  ToolTip="Show or hide the quick-action bar"
                   Foreground="{DynamicResource TextPrimaryBrush}"
                   FontFamily="{DynamicResource AirBarFontFamily}"
                   Margin="0,0,0,8"/>
         <CheckBox x:Name="HistoryCheck"
                   Content="Track history"
+                  ToolTip="Remember recently closed windows"
                   Foreground="{DynamicResource TextPrimaryBrush}"
                   FontFamily="{DynamicResource AirBarFontFamily}"
                   Margin="0,0,0,12"/>
@@ -45,15 +49,13 @@
                    FontSize="11"
                    Margin="0,0,0,4"/>
         <ComboBox x:Name="ThemeCombo"
-                  Padding="8,4"
-                  Background="{DynamicResource HoverBrush}"
-                  BorderBrush="{DynamicResource BorderBrush}"
-                  Foreground="{DynamicResource TextPrimaryBrush}"
-                  FontFamily="{DynamicResource AirBarFontFamily}"
+                  Style="{StaticResource ThemedComboBoxStyle}"
+                  ToolTip="Choose the menu theme"
                   Margin="0,0,0,12"/>
 
         <Button Content="Apply"
                 Height="32"
+                ToolTip="Apply these quick settings"
                 Click="OnApplyClick"
                 Style="{StaticResource MenuItemButtonStyle}"/>
     </StackPanel>

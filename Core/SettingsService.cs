@@ -7,10 +7,7 @@ namespace FloatingTaskbarMenu.Core;
 
 public class SettingsService
 {
-    private static readonly string SettingsPath = Path.Combine(
-        AppIdentity.AppDataDirectory,
-        "settings.json"
-    );
+    private static string SettingsPath => Path.Combine(AppIdentity.AppDataDirectory, "settings.json");
     private readonly BottomActionBarService _bottomActionBarService = new();
 
     private static readonly string AppName = AppIdentity.ProductName;
@@ -34,8 +31,12 @@ public class SettingsService
 
             _bottomActionBarService.EnsureSlots(Settings);
             Settings.CurrentTheme = ThemeService.NormalizeThemeName(Settings.CurrentTheme);
+            var settingsChanged = MigrateDefaultWin11Style();
             Settings.AutoStartWithWindows = IsAutoStartEnabled();
             SyncThemeModeFields();
+
+            if (settingsChanged)
+                Save();
         }
         catch
         {
@@ -44,6 +45,19 @@ public class SettingsService
             Settings.CurrentTheme = ThemeService.NormalizeThemeName(Settings.CurrentTheme);
             SyncThemeModeFields();
         }
+    }
+
+    private bool MigrateDefaultWin11Style()
+    {
+        if (Settings.DefaultWin11StyleMigrated)
+            return false;
+
+        var isModernDefaultTheme = Settings.CurrentTheme is "Dark" or "Light";
+        if (isModernDefaultTheme && Math.Abs(Settings.CornerRadius - 12) < 0.01)
+            Settings.CornerRadius = 8;
+
+        Settings.DefaultWin11StyleMigrated = true;
+        return true;
     }
 
     private void SyncThemeModeFields()
@@ -65,8 +79,7 @@ public class SettingsService
                 Directory.CreateDirectory(directory);
             }
 
-            var json = JsonSerializer.Serialize(Settings, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(SettingsPath, json);
+            StorageHelpers.WriteJsonAtomic(SettingsPath, Settings);
         }
         catch
         {

@@ -17,6 +17,7 @@
                             Height="28"
                             Margin="1"
                             Padding="2"
+                            ToolTip="{Binding Tooltip}"
                             Style="{StaticResource AuxiliaryButtonStyle}">
                         <Image Source="{Binding Icon}"
                                Width="20"

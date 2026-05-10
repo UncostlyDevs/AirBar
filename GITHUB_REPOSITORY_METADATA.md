@@ -5,10 +5,10 @@ Use this file as the paste-ready source for the GitHub repository About panel, t
 ## Recommended GitHub Description
 
 ```text
-Floating Windows taskbar menu, window switcher, and app launcher for Windows 10/11.
+Floating Windows taskbar menu with Workspace Memory, window switching, and app launching for Windows 10/11.
 ```
 
-This is short enough for GitHub search results and still includes the strongest discovery terms: `Windows`, `taskbar`, `window switcher`, `app launcher`, and `Windows 10/11`.
+This is short enough for GitHub search results and still includes the strongest discovery terms: `Windows`, `taskbar`, `Workspace Memory`, `window switching`, `app launching`, and `Windows 10/11`.
 
 ## Recommended Homepage
 
@@ -46,7 +46,7 @@ If GitHub suggests additional topics, accept only ones that describe the actual 
 ## Longer Repository Summary
 
 ```text
-WinAirBar is a lightweight floating taskbar menu for Windows 10 and Windows 11. It helps you switch active windows, reopen recent windows, launch pinned or frequent apps, and reach power, volume, network, settings, folder, and custom actions from a compact tray-based flyout.
+WinAirBar is a lightweight floating taskbar menu for Windows 10 and Windows 11. It helps you save and restore workspaces, switch active windows, reopen recent windows, launch pinned or frequent apps, and reach power, volume, network, settings, folder, and custom actions from a compact tray-based flyout.
 ```
 
 ## Social Preview Copy
@@ -55,7 +55,7 @@ Use this wording if creating a GitHub social preview image:
 
 ```text
 WinAirBar
-Floating taskbar menu and app launcher for Windows 10/11.
+Workspace Memory, floating taskbar menu, and app launcher for Windows 10/11.
 ```
 
 Recommended social preview image size:
@@ -87,7 +87,7 @@ The README now naturally covers these search phrases without stuffing keywords i
 ## Suggested Release Page Short Description
 
 ```text
-WinAirBar v1.2.0 is the first WinAirBar-branded release: a self-contained Windows x64 EXE with the new name, new logo, safe AirBar-to-WinAirBar AppData migration, local-first settings, no telemetry, and a compact floating taskbar menu for windows, apps, and system actions.
+WinAirBar v1.3.0 adds Workspace Memory, smarter restore confidence, cleaner Windows 11-style menus, app-themed confirmations, local-first settings, no telemetry, and a compact floating taskbar menu for windows, apps, and system actions.
 ```
 
 ## Suggested GitHub Issue Labels

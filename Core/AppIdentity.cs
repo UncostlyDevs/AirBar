@@ -49,6 +49,7 @@ public static class AppIdentity
                 CopyFileIfMissing("launcher.json");
                 CopyDirectoryIfMissing("History");
                 CopyDirectoryIfMissing("Profiles");
+                CopyDirectoryIfMissing("Workspaces");
             }
             catch
             {

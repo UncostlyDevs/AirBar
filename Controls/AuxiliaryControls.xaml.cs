@@ -70,7 +70,8 @@ public partial class AuxiliaryControls : WpfUserControl
             Padding = new Thickness(4, 2, 4, 2),
             Height = 52,
             Style = (Style)System.Windows.Application.Current.Resources["AuxiliaryButtonStyle"],
-            Tag = slot
+            Tag = slot,
+            ToolTip = $"{_bottomActionBarService.GetDisplayLabel(slot)} - right-click to customize"
         };
 
         var stack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
@@ -193,7 +194,10 @@ public partial class AuxiliaryControls : WpfUserControl
             ? slot.TargetPath
             : $"{slot.TargetPath} {slot.Arguments}";
 
-        var result = System.Windows.MessageBox.Show(
+        var owner = Window.GetWindow(this);
+        using var autoCloseSuspension = owner is TaskbarMenuWindow menu ? menu.SuspendAutoClose() : null;
+        var result = ThemedMessageBox.Show(
+            owner,
             $"WinAirBar will open this custom target:\n\n{target}\n\nOnly continue if you configured this slot and trust this target.",
             "Confirm Custom Action",
             MessageBoxButton.YesNo,
@@ -207,9 +211,12 @@ public partial class AuxiliaryControls : WpfUserControl
         return true;
     }
 
-    private static void RunPowerAction(string title, string description, string fileName, string arguments)
+    private void RunPowerAction(string title, string description, string fileName, string arguments)
     {
-        var result = System.Windows.MessageBox.Show(
+        var owner = Window.GetWindow(this);
+        using var autoCloseSuspension = owner is TaskbarMenuWindow menu ? menu.SuspendAutoClose() : null;
+        var result = ThemedMessageBox.Show(
+            owner,
             $"This will {description}.\n\nContinue?",
             title,
             MessageBoxButton.YesNo,
@@ -370,7 +377,7 @@ public partial class AuxiliaryControls : WpfUserControl
             var border = new Border
             {
                 BorderThickness = new Thickness(1),
-                Padding = new Thickness(12),
+                Padding = new Thickness(8),
                 Child = content
             };
             border.SetResourceReference(Border.BackgroundProperty, "FlyoutBackgroundBrush");
@@ -485,6 +492,7 @@ public partial class AuxiliaryControls : WpfUserControl
         };
         if (System.Windows.Application.Current.Resources["MenuItemButtonStyle"] is Style buttonStyle)
             button.Style = buttonStyle;
+        button.ToolTip = label;
 
         button.Click += (s, e) =>
         {
@@ -561,7 +569,8 @@ public partial class AuxiliaryControls : WpfUserControl
             Padding = new Thickness(8, 6, 8, 6),
             Margin = new Thickness(0, 2, 0, 0),
             Background = WpfBrushes.Transparent,
-            BorderThickness = new Thickness(0)
+            BorderThickness = new Thickness(0),
+            ToolTip = $"Open {app.Name}"
         };
         if (System.Windows.Application.Current.Resources["LauncherRowButtonStyle"] is Style rowStyle)
             button.Style = rowStyle;
@@ -593,7 +602,7 @@ public partial class AuxiliaryControls : WpfUserControl
                 Width = 22,
                 Height = 22,
                 Margin = new Thickness(0, 0, 10, 0),
-                CornerRadius = new CornerRadius(5),
+                CornerRadius = new CornerRadius(4),
                 Background = GetBrush("ItemHoverBrush", new WpfSolidColorBrush(WpfColor.FromRgb(56, 56, 56))),
                 Child = CreateThemeIcon(ThemeIconKind.Launcher, "\uE71D", 14, "TextSecondaryBrush")
             };

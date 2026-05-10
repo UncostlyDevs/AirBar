@@ -21,7 +21,7 @@
             BorderThickness="{DynamicResource AirBarBorderThickness}"
             CornerRadius="{DynamicResource AirBarCornerRadius}">
         <Border.Effect>
-            <DropShadowEffect Color="Black" BlurRadius="24" ShadowDepth="6" Opacity="0.6"/>
+            <DropShadowEffect Color="Black" BlurRadius="16" ShadowDepth="3" Opacity="0.38"/>
         </Border.Effect>
 
         <Grid>
@@ -34,9 +34,9 @@
             <Border Grid.Row="0"
                     Background="{DynamicResource HeaderBrush}"
                     CornerRadius="{DynamicResource AirBarHeaderCornerRadius}"
-                    Padding="16,12">
+                    Padding="14,10">
                 <StackPanel>
-                    <DockPanel Margin="0,0,0,8"
+                    <DockPanel Margin="0,0,0,6"
                                Cursor="SizeAll"
                                MouseLeftButtonDown="OnDragHandleMouseLeftButtonDown">
                         <Button x:Name="QuickSettingsButton"
@@ -44,11 +44,29 @@
                                 Width="28"
                                 Height="26"
                                 Padding="0"
-                             ToolTip="WinAirBar settings"
+                                ToolTip="WinAirBar settings"
                                 Click="OnQuickSettingsClick"
                                 Style="{StaticResource AuxiliaryButtonStyle}">
                             <controls:ThemeIconView Kind="Settings"
                                                     FallbackGlyph="&#xE713;"
+                                                    IconSize="15"
+                                                    GlyphFontSize="15"
+                                                    Foreground="{DynamicResource HeaderTextBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"/>
+                        </Button>
+                        <Button x:Name="WorkspaceButton"
+                                DockPanel.Dock="Right"
+                                Width="28"
+                                Height="26"
+                                Padding="0"
+                                Margin="0,0,6,0"
+                                ToolTip="Workspace Memory"
+                                Click="OnWorkspaceClick"
+                                Visibility="{Binding ShowWorkspaces, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Style="{StaticResource AuxiliaryButtonStyle}">
+                            <controls:ThemeIconView Kind="Folder"
+                                                    FallbackGlyph="&#xE8A9;"
                                                     IconSize="15"
                                                     GlyphFontSize="15"
                                                     Foreground="{DynamicResource HeaderTextBrush}"
@@ -65,11 +83,12 @@
                     <TextBox x:Name="SearchBox"
                              Text="Search windows..."
                              FontSize="{DynamicResource AirBarBaseFontSize}"
-                             Padding="8,6"
+                             Padding="8,5"
                              Background="{DynamicResource HoverBrush}"
                              BorderThickness="0"
                              Foreground="{DynamicResource TextSecondaryBrush}"
                              FontFamily="{DynamicResource AirBarFontFamily}"
+                             ToolTip="Filter open windows"
                              GotFocus="OnSearchBoxGotFocus"
                              LostFocus="OnSearchBoxLostFocus"
                              TextChanged="OnSearchBoxTextChanged"/>
@@ -80,7 +99,7 @@
 
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto"
-                          Padding="6,4">
+                          Padding="5,3">
                 <StackPanel>
                     <controls:WindowListView x:Name="WindowListView"
                                              Visibility="{Binding ShowWindowList, Converter={StaticResource BoolToVisibilityConverter}}"/>
@@ -92,7 +111,7 @@
             <Border Grid.Row="2"
                     Background="{DynamicResource FooterBrush}"
                     CornerRadius="{DynamicResource AirBarFooterCornerRadius}"
-                    Padding="8,6"
+                    Padding="6,5"
                     Visibility="{Binding ShowAuxiliaryControls, Converter={StaticResource BoolToVisibilityConverter}}">
                 <controls:AuxiliaryControls x:Name="AuxiliaryControls"/>
             </Border>

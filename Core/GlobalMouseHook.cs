@@ -73,6 +73,9 @@ public class GlobalMouseHook : IDisposable
         {
             var error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
             Log($"Failed to set hook. Error: {error}");
+            _hookProc = null;
+            _isHooked = false;
+            return;
         }
         else
         {
@@ -85,7 +88,8 @@ public class GlobalMouseHook : IDisposable
     public void Stop()
     {
         if (!_isHooked) return;
-        UnhookWindowsHookEx(_hookId);
+        if (_hookId != nint.Zero)
+            UnhookWindowsHookEx(_hookId);
         _hookId = nint.Zero;
         _hookProc = null;
         _pressStartTime = null;

@@ -35,6 +35,7 @@
                                 CornerRadius="{DynamicResource AirBarInnerCornerRadius}"
                                 Padding="12,8"
                                 Margin="0,0,0,8"
+                                ToolTip="Right-click for history options"
                                 MouseRightButtonUp="OnHistoryItemRightClick">
                             <StackPanel>
                                 <TextBlock Text="{Binding Title}"
@@ -61,6 +62,7 @@
             <Button Content="Previous"
                     Width="80" Height="32"
                     Margin="0,0,8,0"
+                    ToolTip="Previous history page"
                     Click="OnPreviousClick"
                     Style="{StaticResource MenuItemButtonStyle}"/>
             <TextBlock x:Name="PageIndicator"
@@ -71,6 +73,7 @@
                        Margin="0,0,8,0"/>
             <Button Content="Next"
                     Width="80" Height="32"
+                    ToolTip="Next history page"
                     Click="OnNextClick"
                     Style="{StaticResource MenuItemButtonStyle}"/>
         </StackPanel>
