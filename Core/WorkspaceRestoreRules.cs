@@ -16,6 +16,9 @@ internal static class WorkspaceRestoreRules
     {
         workspace.Name = NormalizeWorkspaceName(string.IsNullOrWhiteSpace(workspace.Name) ? fallbackName : workspace.Name);
         workspace.SchemaVersion = Math.Max(workspace.SchemaVersion, CurrentSchemaVersion);
+        workspace.Metadata ??= new WorkspaceMetadata();
+        workspace.Metadata.AutoActions ??= new List<WorkspaceAutoAction>();
+        workspace.Metadata.ScreenGallery ??= new List<WorkspaceScreenMemory>();
         workspace.Monitors ??= new List<WorkspaceMonitor>();
         workspace.Items ??= new List<WorkspaceItem>();
 

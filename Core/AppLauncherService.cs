@@ -13,9 +13,9 @@ public class AppLauncherService
     private readonly string _launcherFilePath;
     private List<AppLauncher> _apps = new();
 
-    public AppLauncherService()
+    public AppLauncherService(string? appDataDirectory = null)
     {
-        var launcherDirectory = AppIdentity.AppDataDirectory;
+        var launcherDirectory = appDataDirectory ?? AppIdentity.AppDataDirectory;
         Directory.CreateDirectory(launcherDirectory);
         _launcherFilePath = Path.Combine(launcherDirectory, "launcher.json");
         Load();
@@ -148,6 +148,71 @@ public class AppLauncherService
                 .ToList();
         }
         catch { return new List<AppLauncher>(); }
+    }
+
+    public List<AppLauncher> GetAllApps()
+    {
+        try
+        {
+            Load();
+            return _apps
+                .OrderByDescending(a => a.IsPinned)
+                .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch { return new List<AppLauncher>(); }
+    }
+
+    public List<string> GetAllTags()
+    {
+        try
+        {
+            Load();
+            return _apps
+                .SelectMany(a => a.Tags ?? new List<string>())
+                .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .Select(tag => tag.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch { return new List<string>(); }
+    }
+
+    public List<AppLauncher> GetAppsByTag(string tag)
+    {
+        try
+        {
+            Load();
+            if (string.IsNullOrWhiteSpace(tag))
+                return GetAllApps();
+
+            return _apps
+                .Where(a => (a.Tags ?? new List<string>()).Any(t => string.Equals(t, tag.Trim(), StringComparison.OrdinalIgnoreCase)))
+                .OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch { return new List<AppLauncher>(); }
+    }
+
+    public void SetTags(string executablePath, IEnumerable<string> tags)
+    {
+        try
+        {
+            Load();
+            var app = _apps.FirstOrDefault(a => IsSameLauncherTarget(a, executablePath));
+            if (app == null)
+                return;
+
+            app.Tags = tags
+                .Select(tag => tag.Trim())
+                .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            Save();
+        }
+        catch { }
     }
 
     public AppLauncher? GetApp(string executablePath)

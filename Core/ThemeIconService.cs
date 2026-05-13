@@ -125,6 +125,8 @@ public sealed class ThemeIconService
     {
         [BottomBuiltInAction.History] = ThemeIconKind.History,
         [BottomBuiltInAction.Launcher] = ThemeIconKind.Launcher,
+        [BottomBuiltInAction.Workspaces] = ThemeIconKind.Folder,
+        [BottomBuiltInAction.CaptureWorkspace] = ThemeIconKind.Folder,
         [BottomBuiltInAction.FrequentApps] = ThemeIconKind.Launcher,
         [BottomBuiltInAction.Settings] = ThemeIconKind.Settings,
         [BottomBuiltInAction.AirBarSettings] = ThemeIconKind.Settings,
@@ -136,7 +138,23 @@ public sealed class ThemeIconService
         [BottomBuiltInAction.Restart] = ThemeIconKind.Restart,
         [BottomBuiltInAction.WifiSettings] = ThemeIconKind.Network,
         [BottomBuiltInAction.VolumeMixer] = ThemeIconKind.VolumeMute,
-        [BottomBuiltInAction.OpenAppDataFolder] = ThemeIconKind.Folder
+        [BottomBuiltInAction.OpenAppDataFolder] = ThemeIconKind.Folder,
+        [BottomBuiltInAction.TaskManager] = ThemeIconKind.Launcher,
+        [BottomBuiltInAction.FileExplorer] = ThemeIconKind.Folder,
+        [BottomBuiltInAction.ScreenSnip] = ThemeIconKind.Launcher,
+        [BottomBuiltInAction.ControlPanel] = ThemeIconKind.Settings,
+        [BottomBuiltInAction.DisplaySettings] = ThemeIconKind.Settings,
+        [BottomBuiltInAction.SoundSettings] = ThemeIconKind.SoundSettings,
+        [BottomBuiltInAction.BluetoothSettings] = ThemeIconKind.Network,
+        [BottomBuiltInAction.ClipboardSettings] = ThemeIconKind.Folder,
+        [BottomBuiltInAction.NotificationsSettings] = ThemeIconKind.Settings,
+        [BottomBuiltInAction.DefaultAppsSettings] = ThemeIconKind.Settings,
+        [BottomBuiltInAction.StorageSettings] = ThemeIconKind.Folder,
+        [BottomBuiltInAction.WindowsUpdate] = ThemeIconKind.Settings,
+        [BottomBuiltInAction.DocumentsFolder] = ThemeIconKind.Folder,
+        [BottomBuiltInAction.DownloadsFolder] = ThemeIconKind.Folder,
+        [BottomBuiltInAction.DesktopFolder] = ThemeIconKind.Folder,
+        [BottomBuiltInAction.UserProfileFolder] = ThemeIconKind.Folder
     };
 
     public BitmapSource? GetIcon(BottomBuiltInAction action)

@@ -285,11 +285,53 @@
                 <Expander Header="Bottom Actions" Style="{StaticResource SettingsExpanderStyle}">
                     <Border Style="{StaticResource SettingsSectionStyle}">
                         <StackPanel>
-                        <TextBlock Text="Configure the 4 quick-action slots shown at the bottom of the WinAirBar menu."
+                        <TextBlock Text="Configure the 5 quick-action slots shown at the bottom of the WinAirBar menu."
                                        Style="{StaticResource SettingsHelpTextStyle}"
                                        TextWrapping="Wrap"
                                        Margin="0,0,0,10"/>
                             <StackPanel x:Name="BottomActionsPanel"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <Expander Header="Backup &amp; Restore" Style="{StaticResource SettingsExpanderStyle}">
+                    <Border Style="{StaticResource SettingsSectionStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Export or import readable local JSON backups. Import creates a pre-import backup first."
+                                       Style="{StaticResource SettingsHelpTextStyle}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,10"/>
+                            <UniformGrid Rows="4" Columns="2" Margin="0,0,0,8">
+                                <CheckBox x:Name="BackupSettingsCheck" Content="Settings" IsChecked="True" Style="{StaticResource SettingsCheckBoxStyle}"/>
+                                <CheckBox x:Name="BackupBottomActionsCheck" Content="Bottom Actions" IsChecked="True" Style="{StaticResource SettingsCheckBoxStyle}"/>
+                                <CheckBox x:Name="BackupLauncherCheck" Content="Launcher Apps" IsChecked="True" Style="{StaticResource SettingsCheckBoxStyle}"/>
+                                <CheckBox x:Name="BackupProfilesCheck" Content="Pinned Profiles" IsChecked="True" Style="{StaticResource SettingsCheckBoxStyle}"/>
+                                <CheckBox x:Name="BackupHistoryCheck" Content="Window History" IsChecked="True" Style="{StaticResource SettingsCheckBoxStyle}"/>
+                                <CheckBox x:Name="BackupWorkspacesCheck" Content="Workspaces" IsChecked="True" Style="{StaticResource SettingsCheckBoxStyle}"/>
+                                <CheckBox x:Name="BackupSnapshotsCheck" Content="Workspace Snapshots" IsChecked="True" Style="{StaticResource SettingsCheckBoxStyle}"/>
+                            </UniformGrid>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Button Content="Export Backup"
+                                        Padding="8,4"
+                                        ToolTip="Export selected sections to a readable ZIP"
+                                        Click="OnExportBackupClick"
+                                        Style="{StaticResource MenuItemButtonStyle}"/>
+                                <Button Content="Import Backup"
+                                        Margin="8,0,0,0"
+                                        Padding="8,4"
+                                        ToolTip="Preview and import selected sections from a backup ZIP"
+                                        Click="OnImportBackupClick"
+                                        Style="{StaticResource MenuItemButtonStyle}"/>
+                                <Button Content="Workspace Control Center"
+                                        Margin="8,0,0,0"
+                                        Padding="8,4"
+                                        ToolTip="Open the full workspace preview, rules, versions, and switcher console"
+                                        Click="OnOpenWorkspaceControlCenterClick"
+                                        Style="{StaticResource MenuItemButtonStyle}"/>
+                            </StackPanel>
+                            <TextBlock x:Name="BackupStatusText"
+                                       Style="{StaticResource SettingsHelpTextStyle}"
+                                       TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
                 </Expander>

@@ -320,7 +320,7 @@ public partial class App : WpfApplication
                     Log("Window shown");
                     
                     Log("Activating window");
-                    _menuWindow.Activate();
+                    _menuWindow.ActivateForInput();
                     Log("Window activated");
                     
                     Log("Menu window shown successfully");

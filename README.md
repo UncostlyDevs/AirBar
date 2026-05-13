@@ -5,7 +5,7 @@
 <h1 align="center">WinAirBar</h1>
 
 <p align="center">
-  <strong>A lightweight floating Windows taskbar menu with Workspace Memory, window switching, and app launching for Windows 10 and Windows 11.</strong>
+  <strong>A lightweight floating Windows taskbar menu with a local Workspace Control Center, window switching, and app launching for Windows 10 and Windows 11.</strong>
 </p>
 
 <p align="center">
@@ -29,16 +29,20 @@ WinAirBar is a small Windows productivity utility that gives you a compact float
 
 It is built for people who want a cleaner Windows desktop workflow: quick window switching, a fast app launcher, local window history, power controls, volume controls, network shortcuts, and customizable action buttons in one lightweight tray app.
 
-WinAirBar was previously released as **AirBar**. Version 1.2.0 renamed the product, updated the release metadata, and safely migrates existing local settings from `%AppData%\AirBar` to `%AppData%\WinAirBar`. Version 1.3.0 adds Workspace Memory, cleaner Windows 11-style UI polish, app-themed dialogs, and stronger workspace restore confidence.
+WinAirBar was previously released as **AirBar**. Version 1.2.0 renamed the product, updated the release metadata, and safely migrates existing local settings from `%AppData%\AirBar` to `%AppData%\WinAirBar`. Version 1.3.0 added Workspace Memory, cleaner Windows 11-style UI polish, app-themed dialogs, and stronger workspace restore confidence. Version 1.4.0 adds the Workspace Control Center, visual workspace screens, restore modes, cleanup planning, versions, rules, suggestions, launcher tags, and stronger backup conflict handling.
 
-## Current Release: v1.3.0
+WinAirBar is passion-built, free, local-first desktop software. The project remains MIT-licensed and does not add paid tiers, account requirements, telemetry, or cloud sync.
 
-WinAirBar v1.3.0 is the Workspace Memory release. It adds a local-first way to capture, preview, and restore window layouts directly from the WinAirBar menu, plus a cleaner default Windows 11-style interface.
+## Current Release: v1.4.0
 
-- Capture the current workspace, including window positions, monitor layout, apps, and document paths when available.
-- Preview restore readiness before acting, including missing apps, missing documents, and monitor-layout changes.
-- Restore, update, and delete saved workspaces from the menu without leaving the main flow.
-- Use sharper Windows 11-style defaults, readable Settings dropdowns in dark and light mode, and app-themed confirmation dialogs.
+WinAirBar v1.4.0 is the Workspace Control Center release. It keeps the quick Workspace flyout fast while adding a deeper local control surface for previewing, restoring, organizing, backing up, and visually remembering workspaces.
+
+- Open a dedicated Workspace Control Center with workspace cards, details, screen galleries, restore plans, history, rules, suggestions, groups, launcher tags, and backup controls.
+- Preview restore plans before acting, including matched windows, windows to launch, missing targets, low-confidence matches, monitor remaps, changed positions, and extra current windows.
+- Choose restore modes for Full Restore, Missing Only, Layout Only, and Clean Restore.
+- Review Clean Restore cleanup choices before minimizing or closing extra windows. Protected/risky windows are kept by default, and close actions require final confirmation.
+- Save local screen memories for workspaces, with larger galleries and small thumbnails in the workspace list.
+- Keep versions, timeline history, rules, local suggestions, launcher tags, per-workspace auto-actions, and backup conflict choices readable and local.
 - Keep everything local under your user profile: no account, no telemetry, no cloud workspace sync.
 
 ## Why Use It?
@@ -46,7 +50,7 @@ WinAirBar v1.3.0 is the Workspace Memory release. It adds a local-first way to c
 - Get a floating Windows taskbar menu from a mouse trigger instead of reaching for the main taskbar.
 - Switch between active windows from a compact flyout.
 - Reopen recent windows and frequently used apps faster.
-- Save and restore workspace layouts before switching projects or returning to a previous setup.
+- Save, preview, restore, and visually recognize workspace layouts before switching projects or returning to a previous setup.
 - Keep pinned launch shortcuts close without cluttering the desktop.
 - Put power, volume, network, settings, and custom actions in one bottom action bar.
 - Use retro Windows-inspired themes alongside modern Windows 10/11 styling.
@@ -72,15 +76,35 @@ Track window history locally so you can reopen or return to recent work more eas
 
 ### Bottom Action Bar
 
-Configure quick actions for power, restart, sleep, sign out, lock, volume, sound settings, network, folders, app data, settings, and custom launch targets.
+Configure five compact quick actions for power, restart, sleep, sign out, lock, volume, sound settings, network, folders, Windows tools, Workspace Memory, and custom launch targets.
 
-### Workspace Memory
+### Workspace Control Center
 
-Capture the current window layout, choose a saved workspace from the menu, and restore it later. Workspace Memory shows window counts, monitor layout changes, missing apps/documents, and restore readiness before you act. Restore results are summarized inline after each restore, so you can tell whether the workspace came back cleanly or needs attention.
+Capture the current window layout, choose a saved workspace, and restore it later with a preview-first plan. The Workspace Control Center shows workspace cards, notes, screen galleries, restore plans, versions, timeline history, rules, suggestions, groups, launcher tags, and backup controls. Restore results are summarized after each restore, so you can tell whether the workspace came back cleanly or needs attention.
+
+### Restore Modes And Cleanup
+
+Use Full Restore, Missing Only, Layout Only, or Clean Restore depending on what you need. Clean Restore shows extra current windows with Keep, Minimize, or Close choices. Risky/protected windows are kept by default, and closing windows requires a final confirmation.
+
+### Workspace Screens
+
+WinAirBar saves local screen memories when you save or update a workspace. The Control Center shows large screen galleries for detail and smaller thumbnails in the workspace list for quick visual recognition.
+
+### Workspace Switcher
+
+Open a desktop-switcher-style overlay with horizontal workspace cards. Click a card to preview/restore, use arrow navigation, press Enter to restore, or Esc to close.
+
+### Rules, Suggestions, Groups, And Tags
+
+Window Rules can exclude apps from capture, protect apps from cleanup, set default cleanup actions, set restore modes, and choose default placement. Local suggestions can recommend a workspace when the same app/window group appears repeatedly. Pinned window groups and launcher tags help organize lighter workflows without needing a full saved layout.
+
+### Backup & Restore
+
+Export selected local data to a normal ZIP with readable JSON files, then preview and import only the sections you choose. Backups can include settings, bottom actions, launcher apps, pinned profiles, window history, workspaces, and workspace snapshots. Imports create a local pre-import backup and ask how to handle conflicts before replacing selected data.
 
 ### Safety Prompts
 
-Power actions ask for confirmation before shutdown, restart, sleep, or sign out. Custom action slots ask for confirmation before first launch. WinAirBar-owned confirmation and info dialogs use the app theme instead of the default system message-box style.
+Power actions ask for confirmation before shutdown, restart, sleep, or sign out. Dangerous per-workspace auto-actions require confirmation every time. Custom action slots ask for confirmation before first launch. WinAirBar-owned confirmation and info dialogs use the app theme instead of the default system message-box style.
 
 ### Windows Themes
 
@@ -92,10 +116,11 @@ Download the latest Windows x64 release from:
 
 https://github.com/UncostlyDevs/WinAirBar/releases/latest
 
-Current v1.3.0 release asset:
+Current v1.4.0 release assets:
 
 ```text
-WinAirBar-v1.3.0-win-x64.exe
+WinAirBar-v1.4.0-win-x64.exe
+WinAirBar-v1.4.0-win-x64.zip
 ```
 
 WinAirBar is distributed as a self-contained Windows executable. No installer is required.
@@ -103,13 +128,19 @@ WinAirBar is distributed as a self-contained Windows executable. No installer is
 Because the executable is currently unsigned, Windows SmartScreen may show a first-run warning. Verify the SHA256 checksum published with the release before running the EXE.
 
 ```powershell
-Get-FileHash .\WinAirBar-v1.3.0-win-x64.exe -Algorithm SHA256
+Get-FileHash .\WinAirBar-v1.4.0-win-x64.exe -Algorithm SHA256
 ```
 
-Expected v1.3.0 SHA256:
+Expected v1.4.0 EXE SHA256:
 
 ```text
-2915BE21BCF8DC6E870649BCD1F5E8EAFB2B5D6BC43BD4FEA61EF80C0A6C9A59
+B9F7F7EFF024893F5071EA72EDE68EA41C0FBC46463056CE5F6E50FB3CA7FC0B
+```
+
+Expected v1.4.0 ZIP SHA256:
+
+```text
+D1A2902AA87C8585ABAD46A4CB3FCAF2D3EDDAC11957D15678961712E6BE58E1
 ```
 
 ## Requirements
@@ -150,7 +181,7 @@ bin\Release\net8.0-windows\win-x64\publish\
 - WinAirBar does not collect telemetry.
 - WinAirBar does not require a user account.
 - WinAirBar does not send your app data to a remote service.
-- Settings, launcher data, pinned profiles, logs, and window history are stored locally under `%AppData%\WinAirBar`.
+- Settings, launcher data, pinned profiles, logs, window history, workspace data, workspace screenshots, rules, timeline events, and suggestions are stored locally under `%AppData%\WinAirBar`.
 - First launch of v1.2.0 copies existing AirBar data from `%AppData%\AirBar` only when WinAirBar data is not already present.
 - The old `%AppData%\AirBar` folder is left in place as a backup.
 - Autostart uses the current user's Windows Run key only.
@@ -168,6 +199,9 @@ WinAirBar may be useful if you searched for:
 
 - Windows taskbar launcher
 - floating taskbar menu for Windows
+- Windows workspace manager
+- Windows workspace restore
+- Windows workspace switcher
 - Windows 11 app launcher
 - Windows window switcher
 - taskbar alternative for Windows
@@ -181,7 +215,7 @@ WinAirBar is intentionally not a full keyboard search launcher, file indexer, or
 
 - `App.xaml` / `App.xaml.cs` - application startup, theme loading, and tray icon.
 - `Controls/` - flyout controls for windows, launcher, settings, history, and bottom actions.
-- `Core/` - window tracking, settings, launcher, history, theme, migration, and system helper services.
+- `Core/` - window tracking, settings, launcher, history, workspace, backup, theme, migration, and system helper services.
 - `Models/` - serializable app and settings models.
 - `Styles/` - shared Windows style resources.
 - `Windows/` - WinAirBar windows and dialogs.

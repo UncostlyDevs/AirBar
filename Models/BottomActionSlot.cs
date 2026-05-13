@@ -10,6 +10,9 @@ public enum BottomBuiltInAction
 {
     History,
     Launcher,
+    Workspaces,
+    CaptureWorkspace,
+    WorkspaceSwitcher,
     PowerMenu,
     Settings,
     AirBarSettings,
@@ -21,7 +24,23 @@ public enum BottomBuiltInAction
     WifiSettings,
     VolumeMixer,
     FrequentApps,
-    OpenAppDataFolder
+    OpenAppDataFolder,
+    TaskManager,
+    FileExplorer,
+    ScreenSnip,
+    ControlPanel,
+    DisplaySettings,
+    SoundSettings,
+    BluetoothSettings,
+    ClipboardSettings,
+    NotificationsSettings,
+    DefaultAppsSettings,
+    StorageSettings,
+    WindowsUpdate,
+    DocumentsFolder,
+    DownloadsFolder,
+    DesktopFolder,
+    UserProfileFolder
 }
 
 public class BottomActionSlot

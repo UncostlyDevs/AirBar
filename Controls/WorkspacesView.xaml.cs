@@ -13,9 +13,16 @@ public partial class WorkspacesView : WpfUserControl
     private WindowManager? _windowManager;
     private SettingsService? _settingsService;
     private Window? _ownerWindow;
+    private readonly WorkspaceSnapshotService _snapshotService = new();
+    private readonly WorkspaceTimelineService _timelineService = new();
+    private readonly WorkspaceVersionService _versionService = new();
+    private readonly WorkspaceRuleService _ruleService = new();
+    private readonly WorkspaceAnalysisService _analysisService;
+    private readonly WorkspaceAutoActionService _autoActionService = new();
 
     public WorkspacesView()
     {
+        _analysisService = new WorkspaceAnalysisService(_ruleService);
         InitializeComponent();
     }
 
@@ -26,6 +33,7 @@ public partial class WorkspacesView : WpfUserControl
         _settingsService = settingsService;
         _ownerWindow = ownerWindow;
         RefreshWorkspaces();
+        RefreshSnapshots();
     }
 
     public void RefreshWorkspaces()
@@ -48,9 +56,26 @@ public partial class WorkspacesView : WpfUserControl
         var hasWorkspaces = names.Count > 0;
         WorkspaceCombo.Visibility = hasWorkspaces ? Visibility.Visible : Visibility.Collapsed;
         RestoreButton.IsEnabled = hasWorkspaces;
+        RestoreMissingOnlyButton.IsEnabled = hasWorkspaces;
         UpdateButton.IsEnabled = hasWorkspaces;
         DeleteButton.IsEnabled = hasWorkspaces;
+        UndoRestoreButton.IsEnabled = _snapshotService.HasAutomaticRollback();
         RefreshSummary();
+    }
+
+    private void RefreshSnapshots()
+    {
+        var current = SnapshotCombo.SelectedItem as string;
+        var names = _snapshotService.GetManualSnapshotNames();
+        SnapshotCombo.ItemsSource = names;
+        SnapshotCombo.SelectedItem = current != null && names.Contains(current, StringComparer.OrdinalIgnoreCase)
+            ? current
+            : names.FirstOrDefault();
+
+        var hasSnapshots = names.Count > 0;
+        SnapshotCombo.Visibility = hasSnapshots ? Visibility.Visible : Visibility.Collapsed;
+        RestoreSnapshotButton.IsEnabled = hasSnapshots;
+        UndoRestoreButton.IsEnabled = _snapshotService.HasAutomaticRollback();
     }
 
     private void RefreshSummary()
@@ -93,7 +118,7 @@ public partial class WorkspacesView : WpfUserControl
     private void OnWorkspaceSelectionChanged(object sender, SelectionChangedEventArgs e)
         => RefreshSummary();
 
-    private void OnCaptureClick(object sender, RoutedEventArgs e)
+    public void CaptureWorkspaceInteractive()
     {
         var defaultName = $"Workspace {DateTime.Now:MMM d HH-mm}";
         var owner = GetOwnerWindow();
@@ -111,10 +136,16 @@ public partial class WorkspacesView : WpfUserControl
         Capture(dialog.InputText);
     }
 
+    private void OnCaptureClick(object sender, RoutedEventArgs e)
+        => CaptureWorkspaceInteractive();
+
     private void OnUpdateClick(object sender, RoutedEventArgs e)
     {
         if (SelectedWorkspaceName() is { } name)
+        {
+            _versionService.SaveVersionBeforeOverwrite(name);
             Capture(name);
+        }
     }
 
     private void Capture(string name)
@@ -122,7 +153,8 @@ public partial class WorkspacesView : WpfUserControl
         if (_workspaceService == null || _windowManager == null || _settingsService == null)
             return;
 
-        var workspace = _workspaceService.CaptureWorkspace(name, _windowManager.GetWindows(), _settingsService.Settings, _windowManager);
+        var workspace = _workspaceService.CaptureWorkspace(name, _windowManager.GetWindows(), _settingsService.Settings, _windowManager, _ruleService.GetRules());
+        _timelineService.Record(workspace.Name, "capture", $"Captured {workspace.Items.Count} window(s).");
         RefreshWorkspaces();
         SelectWorkspace(workspace.Name);
 
@@ -145,7 +177,11 @@ public partial class WorkspacesView : WpfUserControl
         var owner = GetOwnerWindow();
         using var autoCloseSuspension = owner is TaskbarMenuWindow menu ? menu.SuspendAutoClose() : null;
         var workspace = _workspaceService.LoadWorkspace(name);
+        _snapshotService.CaptureAutomaticRollback(_windowManager.GetWindows(), _settingsService?.Settings ?? new Settings(), _windowManager);
+        UndoRestoreButton.IsEnabled = true;
         var result = await Task.Run(() => _workspaceService.RestoreWorkspace(workspace, _windowManager));
+        RunAutoActionsWithConfirmations(workspace);
+        _timelineService.Record(workspace.Name, "restore", $"Restored {result.RestoredCount}, launched {result.LaunchedCount}, skipped {result.SkippedCount}, failed {result.FailedCount}.", WorkspaceTimelineService.FromRestoreResult(result));
         ShowLastRestoreChip(result);
         var notableItems = result.Items
             .Where(item => item.Status is WorkspaceRestoreStatus.Failed or WorkspaceRestoreStatus.Skipped || item.IgnoredLowConfidenceMatch)
@@ -171,6 +207,103 @@ public partial class WorkspacesView : WpfUserControl
             result.FailedCount > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
     }
 
+    private async void OnRestoreMissingOnlyClick(object sender, RoutedEventArgs e)
+    {
+        if (_workspaceService == null || _windowManager == null || SelectedWorkspaceName() is not { } name)
+            return;
+
+        var owner = GetOwnerWindow();
+        using var autoCloseSuspension = owner is TaskbarMenuWindow menu ? menu.SuspendAutoClose() : null;
+        var workspace = _workspaceService.LoadWorkspace(name);
+        _snapshotService.CaptureAutomaticRollback(_windowManager.GetWindows(), _settingsService?.Settings ?? new Settings(), _windowManager);
+        UndoRestoreButton.IsEnabled = true;
+        var plan = _analysisService.BuildPlan(workspace, _windowManager.GetWindows(), _windowManager, WorkspaceRestoreMode.MissingOnly);
+        var result = await Task.Run(() => _analysisService.ExecutePlan(plan, workspace, _windowManager));
+        RunAutoActionsWithConfirmations(workspace);
+        _timelineService.Record(workspace.Name, "restore-missing-only", $"Missing-only restore launched {result.LaunchedCount}, skipped {result.SkippedCount}.", WorkspaceTimelineService.FromRestoreResult(result));
+        ShowLastRestoreChip(result);
+        ThemedMessageBox.Show(owner, $"Missing-only restore complete: {result.LaunchedCount} launched, {result.SkippedCount} skipped.", "Restore Missing Only", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private async void OnUndoRestoreClick(object sender, RoutedEventArgs e)
+    {
+        if (_workspaceService == null || _windowManager == null)
+            return;
+
+        var rollback = _snapshotService.LoadLatestAutomaticRollback();
+        if (rollback == null)
+        {
+            UndoRestoreButton.IsEnabled = false;
+            return;
+        }
+
+        var owner = GetOwnerWindow();
+        using var autoCloseSuspension = owner is TaskbarMenuWindow menu ? menu.SuspendAutoClose() : null;
+        var result = await Task.Run(() => _workspaceService.RestoreWorkspace(rollback, _windowManager));
+        _timelineService.Record(rollback.Name, "undo-restore", $"Undo restored {result.RestoredCount}, launched {result.LaunchedCount}.", WorkspaceTimelineService.FromRestoreResult(result));
+        ShowLastRestoreChip(result);
+        ThemedMessageBox.Show(
+            owner,
+            $"Undo complete: {result.RestoredCount} restored, {result.LaunchedCount} launched"
+            + (result.SkippedCount > 0 ? $", {result.SkippedCount} skipped" : "")
+            + (result.FailedCount > 0 ? $", {result.FailedCount} failed" : "")
+            + ".",
+            "Undo Restore",
+            MessageBoxButton.OK,
+            result.FailedCount > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
+    }
+
+    private void OnSaveSnapshotClick(object sender, RoutedEventArgs e)
+    {
+        if (_windowManager == null || _settingsService == null)
+            return;
+
+        var owner = GetOwnerWindow();
+        using var autoCloseSuspension = owner is TaskbarMenuWindow menu ? menu.SuspendAutoClose() : null;
+        var dialog = new InputDialog("Save Snapshot", "Snapshot name:", $"Snapshot {DateTime.Now:MMM d HH-mm}")
+        {
+            Owner = owner,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+
+        if (dialog.ShowDialog() != true || string.IsNullOrWhiteSpace(dialog.InputText))
+            return;
+
+        var snapshot = _snapshotService.SaveManualSnapshot(dialog.InputText, _windowManager.GetWindows(), _settingsService.Settings, _windowManager);
+        _timelineService.Record(snapshot.Name, "manual-snapshot", $"Saved manual snapshot with {snapshot.Items.Count} window(s).");
+        RefreshSnapshots();
+        SnapshotCombo.SelectedItem = snapshot.Name;
+        ThemedMessageBox.Show(owner, $"Saved {snapshot.Items.Count} window(s) into snapshot \"{snapshot.Name}\".", "Snapshot Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private async void OnRestoreSnapshotClick(object sender, RoutedEventArgs e)
+    {
+        if (_workspaceService == null || _windowManager == null || SnapshotCombo.SelectedItem is not string name)
+            return;
+
+        var owner = GetOwnerWindow();
+        using var autoCloseSuspension = owner is TaskbarMenuWindow menu ? menu.SuspendAutoClose() : null;
+        _snapshotService.CaptureAutomaticRollback(_windowManager.GetWindows(), _settingsService?.Settings ?? new Settings(), _windowManager);
+        UndoRestoreButton.IsEnabled = true;
+        var snapshot = _snapshotService.LoadManualSnapshot(name);
+        var result = await Task.Run(() => _workspaceService.RestoreWorkspace(snapshot, _windowManager));
+        _timelineService.Record(snapshot.Name, "restore-snapshot", $"Restored snapshot {snapshot.Name}.", WorkspaceTimelineService.FromRestoreResult(result));
+        ShowLastRestoreChip(result);
+        ThemedMessageBox.Show(owner, $"Restored snapshot \"{snapshot.Name}\".", "Snapshot Restore", MessageBoxButton.OK, result.FailedCount > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
+    }
+
+    private void OnSwitcherClick(object sender, RoutedEventArgs e)
+    {
+        if (GetOwnerWindow() is TaskbarMenuWindow menu)
+            menu.OpenWorkspaceSwitcher();
+    }
+
+    private void OnMoreClick(object sender, RoutedEventArgs e)
+    {
+        if (GetOwnerWindow() is TaskbarMenuWindow menu)
+            menu.OpenWorkspaceControlCenter();
+    }
+
     private void OnDeleteClick(object sender, RoutedEventArgs e)
     {
         if (_workspaceService == null || SelectedWorkspaceName() is not { } name)
@@ -183,7 +316,29 @@ public partial class WorkspacesView : WpfUserControl
             return;
 
         _workspaceService.DeleteWorkspace(name);
+        _timelineService.Record(name, "delete", $"Deleted workspace {name}.");
         RefreshWorkspaces();
+    }
+
+    private void RunAutoActionsWithConfirmations(Workspace workspace)
+    {
+        if (_settingsService == null)
+            return;
+
+        var actions = workspace.Metadata?.AutoActions ?? new List<WorkspaceAutoAction>();
+        _autoActionService.RunSafeActions(actions, _settingsService);
+        foreach (var action in _autoActionService.DangerousActions(actions))
+        {
+            var owner = GetOwnerWindow();
+            var result = ThemedMessageBox.Show(
+                owner,
+                $"Workspace \"{workspace.Name}\" wants to run this session action:\n\n{action.Kind}\n\nContinue?",
+                "Confirm Workspace Action",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+            if (result == MessageBoxResult.Yes)
+                _autoActionService.RunDangerousAction(action, _settingsService);
+        }
     }
 
     private Window? GetOwnerWindow()

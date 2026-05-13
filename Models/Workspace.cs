@@ -11,6 +11,7 @@ public class Workspace
     public bool ShowWindowList { get; set; } = true;
     public bool ShowSystemTray { get; set; }
     public bool ShowAuxiliaryControls { get; set; } = true;
+    public WorkspaceMetadata Metadata { get; set; } = new();
     public List<WorkspaceMonitor> Monitors { get; set; } = new();
     public List<WorkspaceItem> Items { get; set; } = new();
 }

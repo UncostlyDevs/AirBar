@@ -1,9 +1,12 @@
 using System.Runtime.InteropServices;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Interop;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using FloatingTaskbarMenu.Controls;
 using FloatingTaskbarMenu.Core;
 using FloatingTaskbarMenu.Models;
@@ -21,6 +24,8 @@ public partial class TaskbarMenuWindow : Window
     private readonly WindowHistoryService _historyService;
     private readonly AppLauncherService _appLauncherService;
     private readonly WorkspaceService _workspaceService;
+    private readonly BottomActionBarService _bottomActionBarService;
+    private readonly string _debugLogPath = Path.Combine(AppIdentity.AppDataDirectory, "app_debug.log");
     private Settings _settings;
     private HistoryWindow? _historyWindow;
     private Popup? _workspacePopup;
@@ -35,7 +40,9 @@ public partial class TaskbarMenuWindow : Window
         _historyService = new WindowHistoryService();
         _appLauncherService = new AppLauncherService();
         _workspaceService = new WorkspaceService();
+        _bottomActionBarService = new BottomActionBarService();
         _settings = settingsService.Settings;
+        _bottomActionBarService.EnsureSlots(_settings);
 
         InitializeComponent();
         DataContext = _settings;
@@ -49,7 +56,7 @@ public partial class TaskbarMenuWindow : Window
         ApplyDwmBackground();
         System.Threading.Tasks.Task.Run(() => _windowManager.PreWarmCache());
         RefreshWindows();
-        SearchBox.Focus();
+        Dispatcher.BeginInvoke(ActivateForInput, DispatcherPriority.ApplicationIdle);
     }
 
     private void OnSearchBoxGotFocus(object sender, RoutedEventArgs e)
@@ -148,6 +155,22 @@ public partial class TaskbarMenuWindow : Window
         _suppressNextDeactivateClose = true;
     }
 
+    public void ActivateForInput()
+    {
+        try
+        {
+            Topmost = true;
+            Show();
+            Activate();
+            Focus();
+
+            var handle = new WindowInteropHelper(this).Handle;
+            if (handle != nint.Zero)
+                SetForegroundWindow(handle);
+        }
+        catch { }
+    }
+
     public IDisposable SuspendAutoClose()
     {
         _autoCloseSuppressionCount++;
@@ -165,11 +188,23 @@ public partial class TaskbarMenuWindow : Window
         // Disabled DWM effects for performance - using simple transparency instead
     }
 
+    private void Log(string message)
+    {
+        try
+        {
+            File.AppendAllText(_debugLogPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}{Environment.NewLine}");
+        }
+        catch { }
+    }
+
     public void RefreshWindows()
     {
         if (WindowListView == null) return;
 
         var windows = _windowManager.GetWindows();
+        _bottomActionBarService.EnsureSlots(_settings);
+        DataContext = null;
+        DataContext = _settings;
         WindowListView.SetWindowManager(_windowManager);
         WindowListView.SetPinnedProfileService(_pinnedProfileService, _settings.CurrentPinnedProfile);
         WindowListView.SetAppLauncherService(_appLauncherService);
@@ -196,7 +231,105 @@ public partial class TaskbarMenuWindow : Window
         catch { }
     }
 
-    private void ShowWorkspacePopup()
+    private void PrepareForSecondaryWindow()
+    {
+        CloseWorkspacePopup();
+        SuppressNextDeactivateClose();
+        Hide();
+    }
+
+    private void RestoreAfterSecondaryWindowFailure()
+    {
+        _suppressNextDeactivateClose = false;
+        Show();
+        ActivateForInput();
+    }
+
+    private void CloseAfterSecondaryWindowShown(Window secondaryWindow)
+    {
+        try { Hide(); } catch { }
+
+        try
+        {
+            if (secondaryWindow.IsVisible)
+                secondaryWindow.Activate();
+
+            SaveCurrentLayout();
+            Close();
+        }
+        catch { }
+    }
+
+    public void ShowWorkspacePopupFromAction(FrameworkElement? placementTarget = null)
+        => ShowWorkspacePopup(placementTarget);
+
+    public void CaptureWorkspaceFromAction()
+    {
+        var view = new WorkspacesView();
+        view.SetContext(_workspaceService, _windowManager, _settingsService, this);
+        view.CaptureWorkspaceInteractive();
+    }
+
+    public void OpenWorkspaceControlCenter()
+    {
+        try
+        {
+            Log("Opening Workspace Control Center from menu");
+            PrepareForSecondaryWindow();
+            var window = new WorkspaceControlCenterWindow(_windowManager, _settingsService)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                Topmost = true
+            };
+            window.Show();
+            window.Activate();
+            window.Dispatcher.BeginInvoke(() =>
+            {
+                window.Topmost = false;
+                window.Activate();
+            }, DispatcherPriority.ApplicationIdle);
+            CloseAfterSecondaryWindowShown(window);
+            Log("Workspace Control Center show requested");
+        }
+        catch (Exception ex)
+        {
+            Log($"Workspace Control Center failed: {ex}");
+            RestoreAfterSecondaryWindowFailure();
+            ThemedMessageBox.Show(
+                null,
+                $"Workspace Control Center could not open.\n\n{ex.Message}",
+                "Workspace Control Center",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+    }
+
+    public void OpenWorkspaceSwitcher()
+    {
+        try
+        {
+            PrepareForSecondaryWindow();
+            var window = new WorkspaceSwitcherWindow(_windowManager, _settingsService)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen
+            };
+            window.Show();
+            window.Activate();
+            CloseAfterSecondaryWindowShown(window);
+        }
+        catch (Exception ex)
+        {
+            RestoreAfterSecondaryWindowFailure();
+            ThemedMessageBox.Show(
+                null,
+                $"Workspace Switcher could not open.\n\n{ex.Message}",
+                "Workspace Switcher",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+    }
+
+    private void ShowWorkspacePopup(FrameworkElement? placementTarget = null)
     {
         try
         {
@@ -219,7 +352,7 @@ public partial class TaskbarMenuWindow : Window
 
             _workspacePopup = new Popup
             {
-                PlacementTarget = WorkspaceButton,
+                PlacementTarget = placementTarget ?? WorkspaceButton,
                 Placement = PlacementMode.Bottom,
                 AllowsTransparency = true,
                 PopupAnimation = PopupAnimation.Fade,
@@ -312,21 +445,39 @@ public partial class TaskbarMenuWindow : Window
 
     private void OpenAirBarSettings()
     {
-        var settingsWindow = new SettingsWindow(_settingsService)
+        try
         {
-            Owner = this
-        };
-        settingsWindow.SettingsApplied += (s, e) =>
+            PrepareForSecondaryWindow();
+            var settingsWindow = new SettingsWindow(_settingsService)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen
+            };
+            settingsWindow.SettingsApplied += (s, e) =>
+            {
+                _settings = _settingsService.Settings;
+                DataContext = _settings;
+                RefreshWindows();
+            };
+            settingsWindow.Closed += (s, e) =>
+            {
+                _settings = _settingsService.Settings;
+                DataContext = _settings;
+                RefreshWindows();
+            };
+            settingsWindow.Show();
+            settingsWindow.Activate();
+            CloseAfterSecondaryWindowShown(settingsWindow);
+        }
+        catch (Exception ex)
         {
-            _settings = _settingsService.Settings;
-            DataContext = _settings;
-            RefreshWindows();
-        };
-        settingsWindow.ShowDialog();
-
-        _settings = _settingsService.Settings;
-        DataContext = _settings;
-        RefreshWindows();
+            RestoreAfterSecondaryWindowFailure();
+            ThemedMessageBox.Show(
+                null,
+                $"Settings could not open.\n\n{ex.Message}",
+                "Settings",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 
     private void OnSettingsClick(object sender, RoutedEventArgs e)
@@ -342,22 +493,25 @@ public partial class TaskbarMenuWindow : Window
             {
                 if (_historyWindow.IsVisible)
                 {
+                    PrepareForSecondaryWindow();
                     _historyWindow.Activate();
+                    CloseAfterSecondaryWindowShown(_historyWindow);
                     return;
                 }
 
                 _historyWindow = null;
             }
 
-            _suppressNextDeactivateClose = true;
+            PrepareForSecondaryWindow();
             _historyWindow = new HistoryWindow(_historyService, _settings.HistoryFilter);
             _historyWindow.Closed += (s, e) => _historyWindow = null;
             _historyWindow.Show();
             _historyWindow.Activate();
+            CloseAfterSecondaryWindowShown(_historyWindow);
         }
         catch
         {
-            _suppressNextDeactivateClose = false;
+            RestoreAfterSecondaryWindowFailure();
         }
     }
 
@@ -366,18 +520,29 @@ public partial class TaskbarMenuWindow : Window
         OpenHistoryWindow();
     }
 
-    private void OnQuickSettingsClick(object sender, RoutedEventArgs e)
-    {
-        AuxiliaryControls.ShowSettingsFlyout(QuickSettingsButton);
-    }
-
     private void OnWorkspaceClick(object sender, RoutedEventArgs e)
     {
-        ShowWorkspacePopup();
+        e.Handled = true;
+        OpenWorkspaceControlCenter();
+    }
+
+    private void OnWorkspaceCaptureClick(object sender, RoutedEventArgs e)
+    {
+        ActivateForInput();
+        ShowWorkspacePopup(WorkspaceCaptureButton);
+    }
+
+    private void OnQuickSettingsClick(object sender, RoutedEventArgs e)
+    {
+        ActivateForInput();
+        AuxiliaryControls.ShowSettingsFlyout(QuickSettingsButton);
     }
 
     [DllImport("user32.dll")]
     private static extern bool GetCursorPos(out System.Drawing.Point lpPoint);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(nint hWnd);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct RECT

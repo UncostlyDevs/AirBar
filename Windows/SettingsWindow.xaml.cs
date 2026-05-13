@@ -25,6 +25,7 @@ public partial class SettingsWindow : Window
     private readonly PinnedProfileService _pinnedProfileService;
     private readonly ThemeService _themeService;
     private readonly BottomActionBarService _bottomActionBarService;
+    private readonly BackupService _backupService;
     private Settings _settings;
     private readonly string _logFilePath = string.Empty;
     private readonly List<BottomActionSlotEditor> _bottomActionEditors = new();
@@ -47,6 +48,7 @@ public partial class SettingsWindow : Window
         Log("Creating ThemeService");
         _themeService = new ThemeService();
         _bottomActionBarService = new BottomActionBarService();
+        _backupService = new BackupService();
         _settings = settingsService.Settings;
 
         Log("Initializing component");
@@ -302,18 +304,24 @@ public partial class SettingsWindow : Window
             autoIconCheck.IsChecked = true;
             iconPathBox.Text = "";
             UpdateBottomActionPreview(previewImage, previewText, defaultSlot);
-            UpdateBottomActionEditorVisibility(actionTypeCombo, builtInCombo, targetBox, targetButtons, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox, iconButtons);
+            UpdateBottomActionEditorVisibility(labelBox, actionTypeCombo, builtInCombo, targetBox, targetButtons, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox, iconButtons);
         };
         iconButtons.Children.Add(resetButton);
         root.Children.Add(iconButtons);
 
         actionTypeCombo.SelectionChanged += (s, e) =>
-            UpdateBottomActionEditorVisibility(actionTypeCombo, builtInCombo, targetBox, targetButtons, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox, iconButtons);
+            UpdateBottomActionEditorVisibility(labelBox, actionTypeCombo, builtInCombo, targetBox, targetButtons, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox, iconButtons);
 
         actionTypeCombo.SelectionChanged += (s, e) =>
+        {
+            SyncBottomActionLabelBox(labelBox, actionTypeCombo, builtInCombo);
             UpdateBottomActionPreview(previewImage, previewText, BuildSlotFromEditor(slot.SlotIndex, labelBox, actionTypeCombo, builtInCombo, targetBox, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox));
+        };
         builtInCombo.SelectionChanged += (s, e) =>
+        {
+            SyncBottomActionLabelBox(labelBox, actionTypeCombo, builtInCombo);
             UpdateBottomActionPreview(previewImage, previewText, BuildSlotFromEditor(slot.SlotIndex, labelBox, actionTypeCombo, builtInCombo, targetBox, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox));
+        };
         labelBox.TextChanged += (s, e) =>
             UpdateBottomActionPreview(previewImage, previewText, BuildSlotFromEditor(slot.SlotIndex, labelBox, actionTypeCombo, builtInCombo, targetBox, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox));
         targetBox.TextChanged += (s, e) =>
@@ -326,7 +334,7 @@ public partial class SettingsWindow : Window
             UpdateBottomActionPreview(previewImage, previewText, BuildSlotFromEditor(slot.SlotIndex, labelBox, actionTypeCombo, builtInCombo, targetBox, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox));
 
         UpdateBottomActionPreview(previewImage, previewText, slot);
-        UpdateBottomActionEditorVisibility(actionTypeCombo, builtInCombo, targetBox, targetButtons, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox, iconButtons);
+        UpdateBottomActionEditorVisibility(labelBox, actionTypeCombo, builtInCombo, targetBox, targetButtons, argumentsBox, workingDirectoryBox, autoIconCheck, iconPathBox, iconButtons);
 
         return new BottomActionSlotEditor
         {
@@ -346,6 +354,7 @@ public partial class SettingsWindow : Window
     }
 
     private void UpdateBottomActionEditorVisibility(
+        WpfTextBox labelBox,
         WpfComboBox actionTypeCombo,
         WpfComboBox builtInCombo,
         WpfTextBox targetBox,
@@ -365,6 +374,29 @@ public partial class SettingsWindow : Window
         autoIconCheck.Visibility = Visibility.Visible;
         iconPathBox.Visibility = Visibility.Visible;
         iconButtons.Visibility = Visibility.Visible;
+        SyncBottomActionLabelBox(labelBox, actionTypeCombo, builtInCombo);
+    }
+
+    private void SyncBottomActionLabelBox(WpfTextBox labelBox, WpfComboBox actionTypeCombo, WpfComboBox builtInCombo)
+    {
+        var isBuiltIn = (actionTypeCombo.SelectedItem as string) != "Custom";
+        if (isBuiltIn)
+        {
+            var selectedLabel = builtInCombo.SelectedItem as string;
+            var selectedDefinition = _bottomActionBarService.GetBuiltIns().FirstOrDefault(b => b.Label == selectedLabel)
+                ?? _bottomActionBarService.GetBuiltIns().First();
+            if (labelBox.Text != selectedDefinition.Label)
+                labelBox.Text = selectedDefinition.Label;
+
+            labelBox.IsReadOnly = true;
+            labelBox.Opacity = 0.72;
+            labelBox.ToolTip = "Built-in action labels are set automatically";
+            return;
+        }
+
+        labelBox.IsReadOnly = false;
+        labelBox.Opacity = 1;
+        labelBox.ToolTip = "Name shown on the custom quick-action button";
     }
 
     private void UpdateBottomActionPreview(WpfImage previewImage, TextBlock previewText, BottomActionSlot slot)
@@ -418,8 +450,7 @@ public partial class SettingsWindow : Window
             var selectedDefinition = _bottomActionBarService.GetBuiltIns().FirstOrDefault(b => b.Label == selectedLabel)
                 ?? _bottomActionBarService.GetBuiltIns().First();
             slot.BuiltInAction = selectedDefinition.Id;
-            if (string.IsNullOrWhiteSpace(slot.DisplayLabel))
-                slot.DisplayLabel = selectedDefinition.Label;
+            slot.DisplayLabel = selectedDefinition.Label;
         }
         else
         {
@@ -769,6 +800,169 @@ public partial class SettingsWindow : Window
         CommitBottomActionEditors();
         ApplyAndPersistAppearance();
         Close();
+    }
+
+    private void OnExportBackupClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            CommitBottomActionEditors();
+            _settingsService.Save();
+
+            var sections = SelectedBackupSections();
+            if (sections == BackupSection.None)
+            {
+                BackupStatusText.Text = "Choose at least one section to export.";
+                return;
+            }
+
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "WinAirBar Backup (*.zip)|*.zip",
+                FileName = Path.GetFileName(_backupService.CreateDefaultBackupPath()),
+                InitialDirectory = Path.Combine(AppIdentity.AppDataDirectory, "Backups")
+            };
+
+            if (dialog.ShowDialog(this) != true)
+                return;
+
+            var result = _backupService.Export(dialog.FileName, sections);
+            BackupStatusText.Text = $"Exported {result.Manifest.Files.Count} file(s) to {result.ZipPath}.";
+        }
+        catch (Exception ex)
+        {
+            BackupStatusText.Text = $"Export failed: {ex.Message}";
+        }
+    }
+
+    private void OnImportBackupClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var sections = SelectedBackupSections();
+            if (sections == BackupSection.None)
+            {
+                BackupStatusText.Text = "Choose at least one section to import.";
+                return;
+            }
+
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "WinAirBar Backup (*.zip)|*.zip|All files|*.*"
+            };
+
+            if (dialog.ShowDialog(this) != true)
+                return;
+
+            var preview = _backupService.PreviewImport(dialog.FileName);
+            var importable = sections & preview.IncludedSections;
+            if (importable == BackupSection.None)
+            {
+                BackupStatusText.Text = "That backup does not include any selected sections.";
+                return;
+            }
+
+            var conflicts = _backupService.PreviewConflicts(dialog.FileName, importable);
+            if (conflicts.Count > 0)
+            {
+                var conflictWindow = new BackupConflictWindow(conflicts) { Owner = this };
+                if (conflictWindow.ShowDialog() != true)
+                    return;
+
+                conflicts = conflictWindow.Conflicts;
+            }
+
+            var message =
+                "Backup includes:" + Environment.NewLine
+                + string.Join(Environment.NewLine, preview.IncludedSectionNames.Select(name => $"- {name}"))
+                + PreviewItemBlock("Workspaces", preview.IncludedWorkspaces)
+                + PreviewItemBlock("Profiles", preview.IncludedProfiles)
+                + PreviewItemBlock("Workspace Snapshots", preview.IncludedWorkspaceSnapshots)
+                + ConflictBlock(conflicts)
+                + Environment.NewLine + Environment.NewLine
+                + "Import selected:" + Environment.NewLine
+                + string.Join(Environment.NewLine, BackupService.SectionNames(importable).Select(name => $"- {name}"))
+                + Environment.NewLine + Environment.NewLine
+                + "A pre-import backup will be created first.";
+
+            var confirm = ThemedMessageBox.Show(this, message, "Import Backup Preview", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+            var result = _backupService.Import(dialog.FileName, importable, conflicts);
+            _settingsService.Load();
+            _settings = _settingsService.Settings;
+            DataContext = null;
+            DataContext = _settings;
+            LoadProfiles();
+            LoadHistoryFilters();
+            LoadThemes();
+            LoadBottomActionEditors();
+            RefreshTextColorControls();
+            SettingsApplied?.Invoke(this, EventArgs.Empty);
+            BackupStatusText.Text = $"Imported {string.Join(", ", BackupService.SectionNames(result.ImportedSections))}. Pre-import backup: {result.PreImportBackupPath}";
+        }
+        catch (Exception ex)
+        {
+            BackupStatusText.Text = $"Import failed: {ex.Message}";
+        }
+    }
+
+    private void OnOpenWorkspaceControlCenterClick(object sender, RoutedEventArgs e)
+    {
+        CommitBottomActionEditors();
+        _settingsService.Save();
+        var window = new WorkspaceControlCenterWindow(new WindowManager(), _settingsService)
+        {
+            Owner = this
+        };
+        window.Show();
+    }
+
+    private static string PreviewItemBlock(string label, IReadOnlyList<string> items)
+    {
+        if (items.Count == 0)
+            return "";
+
+        return Environment.NewLine
+               + Environment.NewLine
+               + $"{label}:"
+               + Environment.NewLine
+               + string.Join(Environment.NewLine, items.Take(12).Select(name => $"- {name}"))
+               + (items.Count > 12 ? Environment.NewLine + $"- ...and {items.Count - 12} more" : "");
+    }
+
+    private static string ConflictBlock(IReadOnlyList<BackupConflict> conflicts)
+    {
+        if (conflicts.Count == 0)
+            return "";
+
+        return Environment.NewLine
+               + Environment.NewLine
+               + "Conflicts use safe defaults:"
+               + Environment.NewLine
+               + string.Join(Environment.NewLine, conflicts.Take(12).Select(conflict => $"- {conflict.Name}: {conflict.Choice}"))
+               + (conflicts.Count > 12 ? Environment.NewLine + $"- ...and {conflicts.Count - 12} more" : "");
+    }
+
+    private BackupSection SelectedBackupSections()
+    {
+        var sections = BackupSection.None;
+        if (BackupSettingsCheck.IsChecked == true)
+            sections |= BackupSection.Settings;
+        if (BackupBottomActionsCheck.IsChecked == true)
+            sections |= BackupSection.BottomActions;
+        if (BackupLauncherCheck.IsChecked == true)
+            sections |= BackupSection.LauncherApps;
+        if (BackupProfilesCheck.IsChecked == true)
+            sections |= BackupSection.PinnedProfiles;
+        if (BackupHistoryCheck.IsChecked == true)
+            sections |= BackupSection.WindowHistory;
+        if (BackupWorkspacesCheck.IsChecked == true)
+            sections |= BackupSection.Workspaces;
+        if (BackupSnapshotsCheck.IsChecked == true)
+            sections |= BackupSection.WorkspaceSnapshots;
+        return sections;
     }
 
     private void CommitBottomActionEditors()

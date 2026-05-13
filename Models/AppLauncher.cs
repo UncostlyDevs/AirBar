@@ -13,4 +13,5 @@ public class AppLauncher
     public int LaunchCount { get; set; }
     public DateTime LastLaunched { get; set; } = DateTime.Now;
     public bool IsPinned { get; set; }
+    public List<string> Tags { get; set; } = new();
 }

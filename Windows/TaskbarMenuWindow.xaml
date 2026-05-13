@@ -13,8 +13,7 @@
         ShowInTaskbar="False"
         Topmost="True"
         Opacity="{Binding MenuOpacity}"
-        Loaded="OnLoaded"
-        Deactivated="OnDeactivated">
+        Loaded="OnLoaded">
 
     <Border Background="{DynamicResource MenuBackgroundBrush}"
             BorderBrush="{DynamicResource MenuBorderBrush}"
@@ -36,9 +35,7 @@
                     CornerRadius="{DynamicResource AirBarHeaderCornerRadius}"
                     Padding="14,10">
                 <StackPanel>
-                    <DockPanel Margin="0,0,0,6"
-                               Cursor="SizeAll"
-                               MouseLeftButtonDown="OnDragHandleMouseLeftButtonDown">
+                    <DockPanel Margin="0,0,0,6">
                         <Button x:Name="QuickSettingsButton"
                                 DockPanel.Dock="Right"
                                 Width="28"
@@ -61,12 +58,28 @@
                                 Height="26"
                                 Padding="0"
                                 Margin="0,0,6,0"
-                                ToolTip="Workspace Memory"
+                                ToolTip="Workspace Control Center"
                                 Click="OnWorkspaceClick"
-                                Visibility="{Binding ShowWorkspaces, Converter={StaticResource BoolToVisibilityConverter}}"
                                 Style="{StaticResource AuxiliaryButtonStyle}">
                             <controls:ThemeIconView Kind="Folder"
                                                     FallbackGlyph="&#xE8A9;"
+                                                    IconSize="15"
+                                                    GlyphFontSize="15"
+                                                    Foreground="{DynamicResource HeaderTextBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"/>
+                        </Button>
+                        <Button x:Name="WorkspaceCaptureButton"
+                                DockPanel.Dock="Right"
+                                Width="28"
+                                Height="26"
+                                Padding="0"
+                                Margin="0,0,6,0"
+                                ToolTip="Quick workspace capture"
+                                Click="OnWorkspaceCaptureClick"
+                                Style="{StaticResource AuxiliaryButtonStyle}">
+                            <controls:ThemeIconView Kind="Pin"
+                                                    FallbackGlyph="&#xE8B7;"
                                                     IconSize="15"
                                                     GlyphFontSize="15"
                                                     Foreground="{DynamicResource HeaderTextBrush}"
@@ -78,7 +91,9 @@
                                    FontWeight="SemiBold"
                                    FontFamily="{DynamicResource AirBarDisplayFontFamily}"
                                    Foreground="{DynamicResource HeaderTextBrush}"
-                                   VerticalAlignment="Center"/>
+                                   VerticalAlignment="Center"
+                                   Cursor="SizeAll"
+                                   MouseLeftButtonDown="OnDragHandleMouseLeftButtonDown"/>
                     </DockPanel>
                     <TextBox x:Name="SearchBox"
                              Text="Search windows..."

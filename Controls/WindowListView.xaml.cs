@@ -106,6 +106,7 @@ public partial class WindowListView : WpfUserControl
             if (WpfApplication.Current.Resources["Win11ContextMenuStyle"] is Style ctxStyle)
                 contextMenu.Style = ctxStyle;
 
+            AddMenuItem(contextMenu, "Restore", () => { _windowManager?.RestoreWindow(windowInfo.Handle); Window.GetWindow(this)?.Close(); });
             AddMenuItem(contextMenu, "Minimize", () => { _windowManager?.MinimizeWindow(windowInfo.Handle); Window.GetWindow(this)?.Close(); });
             AddMenuItem(contextMenu, "Maximize", () => { _windowManager?.MaximizeWindow(windowInfo.Handle); Window.GetWindow(this)?.Close(); });
             AddMenuItem(contextMenu, "Close",    () =>
@@ -114,15 +115,23 @@ public partial class WindowListView : WpfUserControl
                 _windowManager?.CloseWindow(windowInfo.Handle);
                 RefreshWindows(_windowManager?.GetWindows() ?? new());
             });
+            AddMenuItem(contextMenu, "Force Close", () => ForceCloseWindow(windowInfo));
 
+            contextMenu.Items.Add(new Separator());
+            AddMenuItem(contextMenu, "Center", () => { _windowManager?.CenterWindow(windowInfo); Window.GetWindow(this)?.Close(); });
+            AddMenuItem(contextMenu, "Snap Left", () => { _windowManager?.SnapWindowLeft(windowInfo); Window.GetWindow(this)?.Close(); });
+            AddMenuItem(contextMenu, "Snap Right", () => { _windowManager?.SnapWindowRight(windowInfo); Window.GetWindow(this)?.Close(); });
+            AddMoveToMonitorMenu(contextMenu, windowInfo);
+
+            contextMenu.Items.Add(new Separator());
             var hasExecutablePath = HasExecutablePath(windowInfo);
-            AddMenuItem(contextMenu, "Open file location", () => OpenFileLocation(windowInfo), hasExecutablePath);
-            AddMenuItem(contextMenu, "Reopen as administrator", () => ReopenAsAdministrator(windowInfo), hasExecutablePath);
+            AddMenuItem(contextMenu, "Open File Location", () => OpenFileLocation(windowInfo), hasExecutablePath);
+            AddMenuItem(contextMenu, "Reopen as Administrator", () => ReopenAsAdministrator(windowInfo), hasExecutablePath);
 
+            contextMenu.Items.Add(new Separator());
             var isPinned = IsWindowPinned(windowInfo);
-            AddMenuItem(contextMenu, isPinned ? "Unpin" : "Pin", () => TogglePin(windowInfo));
+            AddMenuItem(contextMenu, isPinned ? "Unpin Window" : "Pin Window", () => TogglePin(windowInfo));
 
-            // Add Pin to Launcher option
             var launcherTarget = GetLaunchTarget(windowInfo);
             var launcherApp = _appLauncherService?.GetApp(launcherTarget);
             AddMenuItem(contextMenu, launcherApp?.IsPinned == true ? "Unpin from Launcher" : "Pin to Launcher", () => TogglePinLauncher(windowInfo));
@@ -132,6 +141,44 @@ public partial class WindowListView : WpfUserControl
             e.Handled = true;
         }
     }
+
+    private void AddMoveToMonitorMenu(ContextMenu contextMenu, WindowInfo windowInfo)
+    {
+        var monitors = _windowManager?.GetMonitors() ?? new List<WorkspaceMonitor>();
+        var item = new MenuItem
+        {
+            Header = "Move to Monitor",
+            IsEnabled = WindowControlPlanner.CanMoveToMonitor(monitors)
+        };
+
+        if (WpfApplication.Current.Resources["Win11MenuItemStyle"] is Style itemStyle)
+            item.Style = itemStyle;
+
+        if (item.IsEnabled)
+        {
+            for (var i = 0; i < monitors.Count; i++)
+            {
+                var monitor = monitors[i];
+                var child = new MenuItem
+                {
+                    Header = MonitorLabel(monitor, i)
+                };
+                if (WpfApplication.Current.Resources["Win11MenuItemStyle"] is Style childStyle)
+                    child.Style = childStyle;
+                child.Click += (s, e) =>
+                {
+                    _windowManager?.MoveWindowToMonitor(windowInfo, monitor);
+                    Window.GetWindow(this)?.Close();
+                };
+                item.Items.Add(child);
+            }
+        }
+
+        contextMenu.Items.Add(item);
+    }
+
+    private static string MonitorLabel(WorkspaceMonitor monitor, int index)
+        => $"{(monitor.IsPrimary ? "Primary" : $"Monitor {index + 1}")} ({monitor.WorkWidth:0}x{monitor.WorkHeight:0})";
 
     private void AddMenuItem(ContextMenu menu, string header, Action action, bool isEnabled = true)
     {
@@ -275,5 +322,36 @@ public partial class WindowListView : WpfUserControl
             });
         }
         catch { }
+    }
+
+    private void ForceCloseWindow(WindowInfo windowInfo)
+    {
+        var owner = Window.GetWindow(this);
+        using var autoCloseSuspension = owner is TaskbarMenuWindow menu ? menu.SuspendAutoClose() : null;
+
+        var title = string.IsNullOrWhiteSpace(windowInfo.Title) ? windowInfo.ProcessName : windowInfo.Title;
+        var result = ThemedMessageBox.Show(
+            owner,
+            $"Force Close will immediately terminate this app and may discard unsaved work:\n\n{title}\n\nUse normal Close first unless the window is frozen.",
+            "Force Close Window",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes)
+            return;
+
+        RecordClosedWindowHistory(windowInfo);
+        var closed = _windowManager?.ForceCloseWindow(windowInfo) == true;
+        RefreshWindows(_windowManager?.GetWindows() ?? new());
+
+        if (!closed)
+        {
+            ThemedMessageBox.Show(
+                owner,
+                "WinAirBar could not force close that window. It may already be closed, elevated, protected, or owned by a system process.",
+                "Force Close Failed",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 }

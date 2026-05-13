@@ -5,10 +5,10 @@ Use this file as the paste-ready source for the GitHub repository About panel, t
 ## Recommended GitHub Description
 
 ```text
-Floating Windows taskbar menu with Workspace Memory, window switching, and app launching for Windows 10/11.
+Floating Windows taskbar menu with a local Workspace Control Center, window switching, and app launching for Windows 10/11.
 ```
 
-This is short enough for GitHub search results and still includes the strongest discovery terms: `Windows`, `taskbar`, `Workspace Memory`, `window switching`, `app launching`, and `Windows 10/11`.
+This is short enough for GitHub search results and still includes the strongest discovery terms: `Windows`, `taskbar`, `Workspace Control Center`, `window switching`, `app launching`, and `Windows 10/11`.
 
 ## Recommended Homepage
 
@@ -30,6 +30,11 @@ taskbar-utility
 app-launcher
 application-launcher
 window-switcher
+window-management
+workspace-memory
+workspace-manager
+workspace-switcher
+window-restore
 launcher
 productivity
 desktop
@@ -46,7 +51,7 @@ If GitHub suggests additional topics, accept only ones that describe the actual 
 ## Longer Repository Summary
 
 ```text
-WinAirBar is a lightweight floating taskbar menu for Windows 10 and Windows 11. It helps you save and restore workspaces, switch active windows, reopen recent windows, launch pinned or frequent apps, and reach power, volume, network, settings, folder, and custom actions from a compact tray-based flyout.
+WinAirBar is a lightweight floating taskbar menu for Windows 10 and Windows 11. It helps you manage local workspaces, preview and restore window layouts, switch active windows, reopen recent windows, launch pinned or frequent apps, and reach power, volume, network, settings, folder, and custom actions from a compact tray-based flyout.
 ```
 
 ## Social Preview Copy
@@ -55,7 +60,7 @@ Use this wording if creating a GitHub social preview image:
 
 ```text
 WinAirBar
-Workspace Memory, floating taskbar menu, and app launcher for Windows 10/11.
+Workspace Control Center, floating taskbar menu, and app launcher for Windows 10/11.
 ```
 
 Recommended social preview image size:
@@ -72,6 +77,10 @@ The README now naturally covers these search phrases without stuffing keywords i
 - AirBar
 - Windows taskbar launcher
 - floating taskbar menu
+- Workspace Control Center
+- Windows workspace manager
+- Windows workspace switcher
+- Windows workspace restore
 - Windows app launcher
 - Windows 11 app launcher
 - Windows 10 app launcher
@@ -87,7 +96,7 @@ The README now naturally covers these search phrases without stuffing keywords i
 ## Suggested Release Page Short Description
 
 ```text
-WinAirBar v1.3.0 adds Workspace Memory, smarter restore confidence, cleaner Windows 11-style menus, app-themed confirmations, local-first settings, no telemetry, and a compact floating taskbar menu for windows, apps, and system actions.
+WinAirBar v1.4.0 adds the Workspace Control Center, visual workspace screens, preview-first restore modes, safer cleanup choices, versions, timeline history, rules, local suggestions, launcher tags, stronger backup conflict handling, and a compact floating taskbar menu for windows, apps, and system actions.
 ```
 
 ## Suggested GitHub Issue Labels

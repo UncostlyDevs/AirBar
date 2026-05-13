@@ -231,6 +231,43 @@ public class WindowManager
         ShowWindow(hWnd, ShowWindowCommand.SW_SHOWMAXIMIZED);
     }
 
+    public void RestoreWindow(nint hWnd)
+    {
+        ShowWindow(hWnd, ShowWindowCommand.SW_RESTORE);
+    }
+
+    public void CenterWindow(WindowInfo window)
+    {
+        var monitor = GetMonitorForWindow(window.Handle) ?? GetMonitors().FirstOrDefault();
+        if (monitor == null)
+            return;
+
+        MoveWindowToBounds(window.Handle, WindowControlPlanner.Center(ToRect(window), monitor));
+    }
+
+    public void SnapWindowLeft(WindowInfo window)
+    {
+        var monitor = GetMonitorForWindow(window.Handle) ?? GetMonitors().FirstOrDefault();
+        if (monitor == null)
+            return;
+
+        MoveWindowToBounds(window.Handle, WindowControlPlanner.SnapLeft(monitor));
+    }
+
+    public void SnapWindowRight(WindowInfo window)
+    {
+        var monitor = GetMonitorForWindow(window.Handle) ?? GetMonitors().FirstOrDefault();
+        if (monitor == null)
+            return;
+
+        MoveWindowToBounds(window.Handle, WindowControlPlanner.SnapRight(monitor));
+    }
+
+    public void MoveWindowToMonitor(WindowInfo window, WorkspaceMonitor monitor)
+    {
+        MoveWindowToBounds(window.Handle, WindowControlPlanner.MoveToMonitor(ToRect(window), monitor));
+    }
+
     public void RestoreWindowLayout(WindowInfo window, WorkspaceItem item)
     {
         RestoreWindowLayout(window.Handle, item);
@@ -280,6 +317,51 @@ public class WindowManager
     public void CloseWindow(nint hWnd)
     {
         SendMessage(hWnd, 0x0010, 0, 0); // WM_CLOSE
+    }
+
+    public bool ForceCloseWindow(WindowInfo window)
+    {
+        try
+        {
+            var processId = window.ProcessId;
+            if (processId <= 0 && window.Handle != nint.Zero)
+                GetWindowThreadProcessId(window.Handle, out processId);
+
+            if (processId <= 0 || processId == Environment.ProcessId)
+                return false;
+
+            using var process = Process.GetProcessById(processId);
+            process.Kill(entireProcessTree: true);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static WorkspaceRect ToRect(WindowInfo window)
+        => new()
+        {
+            Left = window.Left,
+            Top = window.Top,
+            Width = window.Width,
+            Height = window.Height
+        };
+
+    private static void MoveWindowToBounds(nint hWnd, WorkspaceRect bounds)
+    {
+        if (bounds.IsEmpty)
+            return;
+
+        ShowWindow(hWnd, ShowWindowCommand.SW_RESTORE);
+        MoveWindow(
+            hWnd,
+            (int)Math.Round(bounds.Left),
+            (int)Math.Round(bounds.Top),
+            (int)Math.Round(bounds.Width),
+            (int)Math.Round(bounds.Height),
+            true);
     }
 
     private string GetWindowText(nint hWnd)

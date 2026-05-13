@@ -9,9 +9,9 @@ public class WorkspaceService
 {
     private readonly string _workspaceDirectory;
 
-    public WorkspaceService()
+    public WorkspaceService(string? appDataDirectory = null)
     {
-        _workspaceDirectory = Path.Combine(AppIdentity.AppDataDirectory, "Workspaces");
+        _workspaceDirectory = Path.Combine(appDataDirectory ?? AppIdentity.AppDataDirectory, "Workspaces");
         Directory.CreateDirectory(_workspaceDirectory);
     }
 
@@ -51,12 +51,13 @@ public class WorkspaceService
         }
     }
 
-    public Workspace CaptureWorkspace(string name, IEnumerable<WindowInfo> windows, Settings settings, WindowManager windowManager)
+    public Workspace CaptureWorkspace(string name, IEnumerable<WindowInfo> windows, Settings settings, WindowManager windowManager, IEnumerable<WorkspaceRule>? rules = null)
     {
         var safeName = NormalizeWorkspaceName(name);
         var now = DateTime.Now;
         var existing = LoadWorkspace(safeName);
         var monitors = windowManager.GetMonitors();
+        var ruleList = rules?.ToList() ?? new List<WorkspaceRule>();
 
         var workspace = new Workspace
         {
@@ -64,6 +65,7 @@ public class WorkspaceService
             Name = safeName,
             CreatedAt = existing.CreatedAt == default ? now : existing.CreatedAt,
             UpdatedAt = now,
+            Metadata = existing.Metadata ?? new WorkspaceMetadata(),
             CapturedProfile = settings.CurrentPinnedProfile,
             CapturedTheme = settings.CurrentTheme,
             ShowWindowList = settings.ShowWindowList,
@@ -71,7 +73,7 @@ public class WorkspaceService
             ShowAuxiliaryControls = settings.ShowAuxiliaryControls,
             Monitors = monitors,
             Items = windows
-                .Where(w => !string.IsNullOrWhiteSpace(w.ProcessName))
+                .Where(w => !string.IsNullOrWhiteSpace(w.ProcessName) && !IsExcludedByRule(w, ruleList))
                 .Select(window => WorkspaceRestoreRules.ToWorkspaceItem(window, monitors))
                 .ToList()
         };
@@ -302,4 +304,9 @@ public class WorkspaceService
 
     public static string NormalizeWorkspaceName(string name)
         => WorkspaceRestoreRules.NormalizeWorkspaceName(name);
+
+    private static bool IsExcludedByRule(WindowInfo window, IReadOnlyList<WorkspaceRule> rules)
+        => rules.Any(rule => rule.ExcludeFromCapture &&
+            ((!string.IsNullOrWhiteSpace(rule.ProcessName) && string.Equals(rule.ProcessName, window.ProcessName, StringComparison.OrdinalIgnoreCase)) ||
+             (!string.IsNullOrWhiteSpace(rule.ExecutablePath) && string.Equals(rule.ExecutablePath, window.ExecutablePath, StringComparison.OrdinalIgnoreCase))));
 }

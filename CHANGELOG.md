@@ -1,5 +1,94 @@
 ﻿# Changelog
 
+## WinAirBar v1.4.0 - Workspace Control Center
+
+WinAirBar v1.4.0 turns Workspace Memory into a full local Workspace Control
+Center with visual workspace cards, restore previews, safer cleanup choices,
+versions, timeline history, rules, suggestions, launcher tags, and stronger
+backup import handling.
+
+### What's New
+
+- Added the dedicated Workspace Control Center with workspace cards, details,
+  restore planning, screen galleries, metadata, rules, suggestions, launcher
+  tags, groups, and timeline views.
+- Added preview-first restore planning with matched windows, launch targets,
+  missing items, low-confidence matches, monitor remaps, changed positions, and
+  extra current windows.
+- Added restore modes for Full Restore, Missing Only, Layout Only, and Clean
+  Restore.
+- Added Clean Restore cleanup choices for extra windows, with protected/risky
+  windows kept by default and close actions requiring final confirmation.
+- Added workspace versions before updates, capped at the latest 10 versions per
+  workspace.
+- Added detailed local timeline logging for workspace changes, restore results,
+  cleanup actions, backup import/export, and suggestion decisions.
+- Added the Workspace Switcher overlay and bottom-action path for fast visual
+  workspace switching.
+- Added deterministic local workspace suggestions based on repeated app/window
+  groups, with save, dismiss, and never-suggest actions.
+- Added Window Rules v1 for capture exclusions, cleanup defaults, restore mode
+  defaults, and default placement.
+- Added pinned window groups, multiple launcher tags per app, and tag editing.
+- Added per-workspace auto-actions for apps, files, folders, URLs, settings
+  URIs, theme/accent changes, volume/mute, and always-confirmed power/session
+  actions.
+- Added backup conflict previews with per-conflict choices: Keep Local, Import
+  As Copy, or Overwrite.
+- Added screen memory for workspaces, including larger galleries and thumbnail
+  previews in the workspace list.
+- Added `Force Close` to window right-click actions.
+
+### UI Polish
+
+- Kept the quick Workspace flyout light while moving deeper controls into the
+  Control Center.
+- Added a dedicated header button for quick workspace capture and kept the full
+  Workspace Control Center available from the workspace button/bottom action.
+- Improved dark-theme contrast across Control Center tabs, cards, and controls.
+- Added right-click workspace card actions for preview, restore, update,
+  rename, duplicate, copy name, snapshot, switcher, and delete.
+- Made full secondary windows close the small launcher menu quickly after they
+  open.
+- Added long-name hover tooltips and responsive workspace card sizing.
+
+### Upgrade Notes
+
+Existing workspace JSON remains compatible. New v1.4 fields are optional and
+stay readable under `%AppData%\WinAirBar`.
+
+Workspace screenshots are stored locally under `%AppData%\WinAirBar` and are
+captured when saving or updating a workspace.
+
+Clean Restore never closes extra windows by default. Closing windows requires a
+preview and a final confirmation.
+
+### Download
+
+Use the Windows x64 self-contained EXE:
+
+`WinAirBar-v1.4.0-win-x64.exe`
+
+SHA256:
+
+`B9F7F7EFF024893F5071EA72EDE68EA41C0FBC46463056CE5F6E50FB3CA7FC0B`
+
+Verify in PowerShell:
+
+```powershell
+Get-FileHash .\WinAirBar-v1.4.0-win-x64.exe -Algorithm SHA256
+```
+
+### Technical Notes
+
+- Version bumped to `1.4.0`.
+- Application manifest bumped to `1.4.0.0`.
+- Release remains local-first, telemetry-free, account-free, and MIT/free.
+- `WorkspaceAudit` coverage passed `31/31` during release-candidate validation.
+- No installer is required.
+- The executable is unsigned, so Windows SmartScreen may show a first-run
+  warning.
+
 ## WinAirBar v1.3.0 - Workspace Memory And Windows 11 Polish
 
 WinAirBar v1.3.0 adds Workspace Memory, improves restore confidence before

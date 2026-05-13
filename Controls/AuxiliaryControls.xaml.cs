@@ -66,9 +66,9 @@ public partial class AuxiliaryControls : WpfUserControl
     {
         var button = new WpfButton
         {
-            Margin = new Thickness(2, 0, 2, 0),
-            Padding = new Thickness(4, 2, 4, 2),
-            Height = 52,
+            Margin = new Thickness(1, 0, 1, 0),
+            Padding = new Thickness(3, 1, 3, 1),
+            Height = 50,
             Style = (Style)System.Windows.Application.Current.Resources["AuxiliaryButtonStyle"],
             Tag = slot,
             ToolTip = $"{_bottomActionBarService.GetDisplayLabel(slot)} - right-click to customize"
@@ -82,8 +82,8 @@ public partial class AuxiliaryControls : WpfUserControl
             var icon = new WpfImage
             {
                 Source = iconSource,
-                Width = 18,
-                Height = 18,
+                Width = 16,
+                Height = 16,
                 HorizontalAlignment = System.Windows.HorizontalAlignment.Center
             };
             RenderOptions.SetBitmapScalingMode(icon, BitmapScalingMode.HighQuality);
@@ -94,7 +94,7 @@ public partial class AuxiliaryControls : WpfUserControl
             stack.Children.Add(new TextBlock
             {
                 Text = _bottomActionBarService.GetIconText(slot),
-                FontSize = 16,
+                FontSize = 15,
                 FontWeight = FontWeights.SemiBold,
                 Foreground = GetBrush("TextPrimaryBrush", WpfBrushes.White),
                 FontFamily = new WpfFontFamily(_bottomActionBarService.GetIconFontFamily(slot)),
@@ -105,10 +105,11 @@ public partial class AuxiliaryControls : WpfUserControl
         var label = new TextBlock
         {
             Text = _bottomActionBarService.GetDisplayLabel(slot),
-            FontSize = 9,
+            FontSize = 8.5,
             HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
             TextAlignment = TextAlignment.Center,
-            TextTrimming = TextTrimming.CharacterEllipsis
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            MaxWidth = 48
         };
         label.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
         label.SetResourceReference(TextBlock.FontFamilyProperty, "AirBarFontFamily");
@@ -147,6 +148,12 @@ public partial class AuxiliaryControls : WpfUserControl
                 case BottomBuiltInAction.FrequentApps:
                     ShowPopup(placementTarget, CreateLauncherPopup());
                     break;
+                case BottomBuiltInAction.Workspaces:
+                case BottomBuiltInAction.CaptureWorkspace:
+                case BottomBuiltInAction.WorkspaceSwitcher:
+                    if (Window.GetWindow(this) is TaskbarMenuWindow workspaceMenu)
+                        workspaceMenu.OpenWorkspaceControlCenter();
+                    break;
                 case BottomBuiltInAction.PowerMenu:
                     ShowPopup(placementTarget, CreatePowerPopup());
                     break;
@@ -180,9 +187,63 @@ public partial class AuxiliaryControls : WpfUserControl
                 case BottomBuiltInAction.OpenAppDataFolder:
                     Process.Start(new ProcessStartInfo { FileName = _bottomActionBarService.GetAppDataDirectory(), UseShellExecute = true });
                     break;
+                case BottomBuiltInAction.TaskManager:
+                    Process.Start(new ProcessStartInfo { FileName = "taskmgr.exe", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.FileExplorer:
+                    Process.Start(new ProcessStartInfo { FileName = "explorer.exe", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.ScreenSnip:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-screenclip:", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.ControlPanel:
+                    Process.Start(new ProcessStartInfo { FileName = "control.exe", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.DisplaySettings:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-settings:display", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.SoundSettings:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-settings:sound", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.BluetoothSettings:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-settings:bluetooth", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.ClipboardSettings:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-settings:clipboard", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.NotificationsSettings:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-settings:notifications", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.DefaultAppsSettings:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-settings:defaultapps", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.StorageSettings:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-settings:storagesense", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.WindowsUpdate:
+                    Process.Start(new ProcessStartInfo { FileName = "ms-settings:windowsupdate", UseShellExecute = true });
+                    break;
+                case BottomBuiltInAction.DocumentsFolder:
+                    OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+                    break;
+                case BottomBuiltInAction.DownloadsFolder:
+                    OpenFolder(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"));
+                    break;
+                case BottomBuiltInAction.DesktopFolder:
+                    OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+                    break;
+                case BottomBuiltInAction.UserProfileFolder:
+                    OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+                    break;
             }
         }
         catch { }
+    }
+
+    private static void OpenFolder(string path)
+    {
+        if (!string.IsNullOrWhiteSpace(path))
+            Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
     }
 
     private bool ConfirmCustomLaunch(BottomActionSlot slot)
@@ -351,6 +412,7 @@ public partial class AuxiliaryControls : WpfUserControl
         _bottomActionBarService.EnsureSlots(_settingsService.Settings);
         _settingsService.Save();
         RefreshButtons();
+        _settingsApplied?.Invoke();
     }
 
     private void CloseActivePopup()

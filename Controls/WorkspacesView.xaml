@@ -211,6 +211,22 @@
                 Click="OnRestoreClick"
                 Style="{StaticResource PrimaryMenuItemButtonStyle}"/>
 
+        <Button x:Name="RestoreMissingOnlyButton"
+                Content="Restore Missing Only"
+                Margin="0,0,0,6"
+                Padding="8,5"
+                ToolTip="Launch only saved workspace items that are not already open"
+                Click="OnRestoreMissingOnlyClick"
+                Style="{StaticResource MenuItemButtonStyle}"/>
+
+        <Button x:Name="UndoRestoreButton"
+                Content="Undo Restore"
+                Margin="0,0,0,8"
+                Padding="8,5"
+                ToolTip="Restore the layout captured just before the latest workspace restore"
+                Click="OnUndoRestoreClick"
+                Style="{StaticResource MenuItemButtonStyle}"/>
+
         <UniformGrid Rows="1" Columns="2" Margin="0,0,0,8">
             <Button x:Name="UpdateButton"
                     Content="Update"
@@ -225,6 +241,52 @@
                     Padding="8,5"
                     ToolTip="Delete this workspace"
                     Click="OnDeleteClick"
+                    Style="{StaticResource MenuItemButtonStyle}"/>
+        </UniformGrid>
+
+        <UniformGrid Rows="1" Columns="2" Margin="0,0,0,8">
+            <Button x:Name="SwitcherButton"
+                    Content="Switcher"
+                    Margin="0,0,3,0"
+                    Padding="8,5"
+                    ToolTip="Open the workspace switcher"
+                    Click="OnSwitcherClick"
+                    Style="{StaticResource MenuItemButtonStyle}"/>
+            <Button x:Name="MoreButton"
+                    Content="More..."
+                    Margin="3,0,0,0"
+                    Padding="8,5"
+                    ToolTip="Open Workspace Control Center"
+                    Click="OnMoreClick"
+                    Style="{StaticResource MenuItemButtonStyle}"/>
+        </UniformGrid>
+
+        <Separator Margin="0,0,0,8"/>
+
+        <TextBlock Text="Snapshots"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   FontSize="10"
+                   Margin="0,0,0,5"/>
+
+        <ComboBox x:Name="SnapshotCombo"
+                  Margin="0,0,0,6"
+                  Style="{StaticResource WorkspaceComboBoxStyle}"
+                  ToolTip="Choose a manual snapshot"/>
+
+        <UniformGrid Rows="1" Columns="2" Margin="0,0,0,8">
+            <Button x:Name="SaveSnapshotButton"
+                    Content="Save Snapshot"
+                    Margin="0,0,3,0"
+                    Padding="8,5"
+                    ToolTip="Save the current layout as a manual snapshot"
+                    Click="OnSaveSnapshotClick"
+                    Style="{StaticResource MenuItemButtonStyle}"/>
+            <Button x:Name="RestoreSnapshotButton"
+                    Content="Restore Snapshot"
+                    Margin="3,0,0,0"
+                    Padding="8,5"
+                    ToolTip="Restore the selected manual snapshot"
+                    Click="OnRestoreSnapshotClick"
                     Style="{StaticResource MenuItemButtonStyle}"/>
         </UniformGrid>
 
